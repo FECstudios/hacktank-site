@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connecting… – tiq</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<p><a href="./">← tiq</a></p>
+<div id="status" class="card"><p>Connecting your TikTok account…</p></div>
+</main>
+
+<script type="module">
+import { EXCHANGE_URL } from "./config.js";
+
+const box = document.getElementById("status");
+const params = new URLSearchParams(location.search);
+
+function show(html) { box.innerHTML = html; }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`); }
+function fail(msg) {
+  show(`<h1>Couldn't connect</h1><p>${esc(msg)}</p><p><a href="connect.html">Try again</a></p>`);
+}
+
+const expectedState = sessionStorage.getItem("tiktok_state");
+sessionStorage.removeItem("tiktok_state");
+
+if (params.get("error")) {
+  fail(params.get("error_description") || params.get("error"));
+} else if (!params.get("code")) {
+  fail("No authorization code was returned.");
+} else if (!expectedState || params.get("state") !== expectedState) {
+  fail("Security check failed (state mismatch). Please start again.");
+} else {
+  try {
+    const res = await fetch(EXCHANGE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: params.get("code") }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+
+    const u = data.user;
+    // Temiz bir URL bırak (code tek kullanımlık, ekranda kalmasın)
+    history.replaceState(null, "", location.pathname);
+    show(`
+      <h1>Connected ✓</h1>
+      <div class="profile">
+        <img src="${esc(u.avatar_url)}" alt="" width="72" height="72">
+        <div>
+          <div class="name">${esc(u.display_name)}</div>
+          <div class="muted">@${esc(u.username)}</div>
+        </div>
+      </div>
+      <p class="muted">Granted scopes: ${esc(data.scope)}</p>
+      <p>Your TikTok account is now verified on tiq.</p>
+    `);
+  } catch (e) {
+    fail(e.message);
+  }
+}
+</script>
+</body>
+</html>

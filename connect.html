@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect TikTok – tiq</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<p><a href="./">← tiq</a></p>
+<h1>Connect your TikTok</h1>
+<p class="lead">We use TikTok to verify that the account you add is really yours.</p>
+
+<div class="card">
+  <p>tiq will be able to see:</p>
+  <ul>
+    <li>Your display name and profile picture <span class="muted">(user.info.basic)</span></li>
+    <li>Your username <span class="muted">(user.info.profile)</span></li>
+  </ul>
+  <p class="muted">tiq never posts, uploads or changes anything on your TikTok.</p>
+  <button id="connect" class="tiktok-btn">Continue with TikTok</button>
+</div>
+
+<footer>
+  <a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a>
+</footer>
+</main>
+
+<script type="module">
+import { TIKTOK_CLIENT_KEY, REDIRECT_URI, SCOPES } from "./config.js";
+
+document.getElementById("connect").onclick = () => {
+  // CSRF koruması: rastgele state üret, dönüşte aynısı mı diye kontrol et
+  const state = crypto.randomUUID();
+  sessionStorage.setItem("tiktok_state", state);
+
+  const params = new URLSearchParams({
+    client_key: TIKTOK_CLIENT_KEY,
+    scope: SCOPES,
+    response_type: "code",
+    redirect_uri: REDIRECT_URI,
+    state,
+  });
+  location.href = `https://www.tiktok.com/v2/auth/authorize/?${params}`;
+};
+</script>
+</body>
+</html>
