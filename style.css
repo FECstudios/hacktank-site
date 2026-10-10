@@ -1,0 +1,9 @@
+body { margin: 0; background: #0b0b0b; color: #eee; font: 16px/1.6 system-ui, sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 40px 20px 60px; }
+h1 { font-size: 36px; margin: 0 0 8px; }
+h2 { font-size: 20px; margin-top: 32px; }
+a { color: #fe2c55; }
+.lead { font-size: 20px; color: #ccc; }
+.muted { color: #888; }
+code { background: #1c1c1c; padding: 1px 6px; border-radius: 4px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #222; color: #888; }
