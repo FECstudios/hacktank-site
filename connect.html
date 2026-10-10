@@ -41,6 +41,8 @@ document.getElementById("connect").onclick = () => {
     response_type: "code",
     redirect_uri: REDIRECT_URI,
     state,
+    // Daha önce izin verilmiş olsa bile TikTok izin ekranını her seferinde göster
+    disable_auto_auth: "1",
   });
   location.href = `https://www.tiktok.com/v2/auth/authorize/?${params}`;
 };
