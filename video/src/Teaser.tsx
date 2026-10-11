@@ -10,7 +10,7 @@ import { Logo } from "./scenes/Logo";
 
 // Sahne uzunlukları beat cinsinden (theme.ts'deki BPM'e göre karelere çevrilir).
 export const SCENES = [
-  { name: "Hook", beats: 16, C: Intro },   // DROP'ta başlar
+  { name: "Hook", beats: 8, C: Intro },   // DROP'ta başlar
   { name: "Feed", beats: 8, C: Feed },
   { name: "IQ", beats: 8, C: IqScramble },
   { name: "Slider", beats: 8, C: SliderScene },
