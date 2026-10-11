@@ -35,6 +35,15 @@
     <button id="submit">SUBMIT</button>
   </div>
 
+  <div id="result" hidden>
+    <img id="result-avatar" width="96" height="96" alt="">
+    <h2 id="result-username"></h2>
+    <p>Their IQ was <b id="result-iq"></b></p>
+    <p id="result-detail"></p>
+    <button id="next-person">NEXT PERSON</button>
+  </div>
+
+
 </section>  
 
 </main>
@@ -139,9 +148,25 @@ document.getElementById("next").onclick = async () => {
         
         console.log(guessError);
         document.getElementById("game-message").textContent = "Ouch. " + guessError.message;
+        document.getElementById("submit").disabled = false
       } else {
         
         document.getElementById("game-message").textContent = "Guess submitted!";
+        document.getElementById("guess").hidden = true
+        document.getElementById("result").hidden = false
+        console.log(data)
+        document.getElementById("result-avatar").src = data.avatar_url
+        document.getElementById("result-username").textContent = "@" + data.tiktok_username
+        document.getElementById("result-iq").textContent = data.target_iq_before
+        if (data.counted == false){
+            document.getElementById("result-detail").textContent = "Your guess was too far off, so it didn’t count."
+        }else if(0 > data.delta){
+            document.getElementById("result-detail").textContent = "Their IQ went down by " + Math.abs(data.delta) + " points"
+        }else if(data.delta ==  0){
+            document.getElementById("result-detail").textContent = "WoW spot on!"
+        }else if(data.delta > 0){
+            document.getElementById("result-detail").textContent = "Their IQ went up by " + data.delta + " points"
+        }
       }
     };
   }
@@ -154,6 +179,14 @@ document.getElementById("prev").onclick = async () => {
     console.log("first video already")
   }
 
+}
+
+document.getElementById("next-person").onclick = async () => {
+  document.getElementById("result").hidden = true
+  document.getElementById("guess-slider").value = 100
+  document.getElementById("guess-value").textContent = 100
+  document.getElementById("start").click();
+  document.getElementById("submit").disabled = false
 }
 
 };
