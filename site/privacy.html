@@ -10,7 +10,7 @@
 <main>
 <p><a href="./">← tiq</a></p>
 <h1>Privacy Policy</h1>
-<p class="muted">Last updated: October 10, 2026</p>
+<p class="muted">Last updated: October 11, 2026</p>
 
 <p>tiq ("we", "us") is a game where players watch the public reposts of other players and guess their in-game IQ score. This policy explains what data we collect, why, and how you can delete it.</p>
 
@@ -18,8 +18,8 @@
 <ul>
   <li><b>Account data:</b> your email address, used to sign in.</li>
   <li><b>TikTok account data (Login Kit):</b> when you connect TikTok, we receive your TikTok open ID, username, display name and profile picture. We only request the scopes <code>user.info.basic</code> and <code>user.info.profile</code>. We never receive your TikTok password.</li>
-  <li><b>Reposts:</b> if you choose to import them using our browser extension, we store the IDs and links of the public videos shown in your own Reposts tab. We do not download or store the videos themselves; they are played using TikTok's official embed player.</li>
-  <li><b>Game data:</b> your in-game IQ test answers and score, the guesses you make, and the guesses others make about you.</li>
+  <li><b>Reposts:</b> after you connect TikTok, we fetch the 10 most recent <b>public</b> reposts from <b>your own</b> TikTok profile through a third-party data provider (Apify) and store their video IDs and the original creators' usernames. We do not download or store the videos themselves; they are played using TikTok's official embed player. We refresh this list at most once every 24 hours.</li>
+  <li><b>Game data:</b> your in-game IQ score, the guesses you make, and the guesses others make about you.</li>
 </ul>
 
 <h2>2. How we use it</h2>
@@ -36,6 +36,8 @@
 <ul>
   <li><b>Supabase</b> – database and authentication.</li>
   <li><b>GitHub Pages</b> – website hosting.</li>
+  <li><b>Apify</b> – fetches the public reposts of your own TikTok profile.</li>
+  <li><b>Brevo</b> – sends login emails.</li>
   <li><b>TikTok</b> – login (Login Kit) and video playback (embed player). TikTok's own privacy policy applies to the embedded player.</li>
 </ul>
 
@@ -46,7 +48,7 @@
 <p>tiq is intended for users aged 13 and older. If you are under the age required in your country to consent to data processing, you must have permission from a parent or guardian.</p>
 
 <h2>7. Note about "IQ"</h2>
-<p>The IQ score in tiq is a game score based on our own puzzles and other players' guesses. It is not a real or scientific IQ measurement.</p>
+<p>The IQ score in tiq is a game score based on other players' guesses (everyone starts at 100). It is not a real or scientific IQ measurement.</p>
 
 <h2>8. Contact</h2>
 <p>Questions or deletion requests: <a href="mailto:craftfec@gmail.com">craftfec@gmail.com</a></p>
