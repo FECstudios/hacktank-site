@@ -148,11 +148,11 @@ Kural: **Puan, IQ ve multiplier hesabı asla tarayıcıda yapılmaz.** Tarayıc�
 
 ## Yapım sırası
 
-- [ ] **1. Şema:** `supabase init`, `supabase/migrations/0001_schema.sql` → tablolar + check'ler + unique'ler
-- [ ] **2. RLS:** `0002_rls.sql` → hepsinde enable + politikalar
-- [ ] **3. Giriş:** `login.html` → `signInWithOtp({ email })` + `verifyOtp({ email, token, type: 'email' })`. Kayıt olunca `profiles` satırı (trigger ile: `on auth.users insert`)
-- [ ] **4. TikTok bağlama:** `tiktok-exchange`'i Supabase kullanıcısına bağla
-- [ ] **5. Repost çekme:** `fetch-reposts` + Apify. Önce `profiles` alan adını Apify Input sekmesinden doğrula
+- [x] **1. Şema:** `supabase init`, `supabase/migrations/0001_schema.sql` → tablolar + check'ler + unique'ler
+- [x] **2. RLS:** `0002_rls.sql` → hepsinde enable + politikalar
+- [x] **3. Giriş:** (OTP kod yerine magic link + Brevo SMTP) `login.html` → `signInWithOtp({ email })` + `verifyOtp({ email, token, type: 'email' })`. Kayıt olunca `profiles` satırı (trigger ile: `on auth.users insert`)
+- [x] **4. TikTok bağlama:** `tiktok-exchange`'i Supabase kullanıcısına bağla
+- [x] **5. Repost çekme:** `fetch-reposts` + Apify. Önce `profiles` alan adını Apify Input sekmesinden doğrula
 - [ ] **6. RPC'ler:** `0003_rpc.sql` → `next_target`, `submit_guess`. SQL editöründe iki test kullanıcısıyla dene
 - [ ] **7. Feed:** `app.html` → player, ↑/↓, %50 kuralı
 - [ ] **8. Tahmin + sonuç ekranı**
