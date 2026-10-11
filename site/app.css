@@ -160,3 +160,11 @@ button:disabled { opacity: .5; cursor: default; }
   .result-text { margin-top: 24px; padding: 0 16px; }
   #next-person { position: absolute; right: 17px; bottom: 23px; height: 77px; width: 196px; }
 }
+
+/* test modu */
+.test-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-top: 8px; padding: 12px; border: 2px dashed #ff9f9f66; border-radius: 16px; }
+.test-tag { width: 100%; text-align: center; color: #ff9f9f; font-size: 18px; letter-spacing: .05em; }
+.pill.small { height: 44px; padding: 0 18px; font-size: 20px; }
+@media (max-width: 800px) {
+  .test-bar { position: absolute; left: 12px; right: 12px; top: 420px; }
+}

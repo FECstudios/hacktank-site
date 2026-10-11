@@ -96,6 +96,12 @@
         <small id="result-detail"></small>
       </div>
       <button class="pill" id="next-person">next person</button>
+      <div class="test-bar" id="test-bar" hidden>
+        <span class="test-tag">TEST MODE · not saved</span>
+        <button class="pill small" id="test-sync">sync to server</button>
+        <button class="pill small" id="test-rewatch">rewatch videos</button>
+        <button class="pill small" id="test-reset">reset my guesses</button>
+      </div>
     </div>
   </main>
 </div>
@@ -248,9 +254,34 @@ document.getElementById("next").onclick = async () => {
   }
 };
 
+// Sonuç ekranını doldur (gerçek tahmin ve test önizlemesi aynı ekranı kullanır)
+function showResult(data) {
+  document.getElementById("game-message").textContent = "";
+  document.getElementById("watching").hidden = true
+  document.getElementById("guess").hidden = true
+  document.getElementById("result").hidden = false
+  console.log(data)
+  document.getElementById("result-avatar").src = data.avatar_url
+  document.getElementById("result-username").textContent = "@" + data.tiktok_username
+  document.getElementById("result-iq").textContent = data.target_iq_before
+  if (data.counted == false){
+      document.getElementById("result-detail").textContent = "Your guess was too far off, so it didn’t count."
+  }else if(0 > data.delta){
+      document.getElementById("result-detail").textContent = "Their IQ went down by " + Math.abs(data.delta) + " points"
+  }else if(data.delta ==  0){
+      document.getElementById("result-detail").textContent = "WoW spot on!"
+  }else if(data.delta > 0){
+      document.getElementById("result-detail").textContent = "Their IQ went up by " + data.delta + " points"
+  }
+  // test modunda: önizlemeyse test butonlarını göster, kaydedildiyse "sync" gizlensin
+  document.getElementById("test-bar").hidden = !testMode;
+  document.getElementById("test-sync").hidden = !data.preview;
+  document.querySelector(".test-tag").textContent = data.preview ? "TEST MODE · not saved" : "TEST MODE · saved to server";
+}
+
 document.getElementById("submit").onclick = async () => {
   document.getElementById("submit").disabled = true
-  const { data, error: guessError } = await supabase.rpc("submit_guess", {
+  const { data, error: guessError } = await supabase.rpc(testMode ? "preview_guess" : "submit_guess", {
     p_target: targetId,
     p_guess: Number(document.getElementById("guess-slider").value),
   });
@@ -260,23 +291,7 @@ document.getElementById("submit").onclick = async () => {
     document.getElementById("game-message").textContent = "Ouch. " + guessError.message;
     document.getElementById("submit").disabled = false
   } else {
-    document.getElementById("game-message").textContent = "";
-    document.getElementById("watching").hidden = true
-    document.getElementById("guess").hidden = true
-    document.getElementById("result").hidden = false
-    console.log(data)
-    document.getElementById("result-avatar").src = data.avatar_url
-    document.getElementById("result-username").textContent = "@" + data.tiktok_username
-    document.getElementById("result-iq").textContent = data.target_iq_before
-    if (data.counted == false){
-        document.getElementById("result-detail").textContent = "Your guess was too far off, so it didn’t count."
-    }else if(0 > data.delta){
-        document.getElementById("result-detail").textContent = "Their IQ went down by " + Math.abs(data.delta) + " points"
-    }else if(data.delta ==  0){
-        document.getElementById("result-detail").textContent = "WoW spot on!"
-    }else if(data.delta > 0){
-        document.getElementById("result-detail").textContent = "Their IQ went up by " + data.delta + " points"
-    }
+    showResult(data);
   }
 };
 
@@ -368,6 +383,50 @@ window.addEventListener("message", (event) => {
   if (typeof msg === "string") { try { msg = JSON.parse(msg); } catch { return; } }
   if (msg?.["x-tiktok-player"] && msg.type === "onStateChange" && event.source === document.getElementById("player")?.contentWindow) playing = msg.value === 1 || msg.value === 3;
 });
+
+
+// ---------- TEST MODU (?test=1, sadece test hesapları) ----------
+// Tahmin sunucuya kaydedilmez (preview_guess); istenirse "sync to server" ile gerçekten gönderilir.
+let testMode = false;
+if (new URLSearchParams(location.search).has("test")) {
+  const { data: tester } = await supabase.rpc("is_tester");
+  testMode = tester === true;
+  document.getElementById("game-message").textContent = testMode
+    ? "TEST MODE: guesses are not saved"
+    : "Test mode is only for test accounts.";
+}
+
+document.getElementById("test-sync").onclick = async () => {
+  document.getElementById("test-sync").disabled = true;
+  const { data, error: syncError } = await supabase.rpc("submit_guess", {
+    p_target: targetId,
+    p_guess: Number(document.getElementById("guess-slider").value),
+  });
+  document.getElementById("test-sync").disabled = false;
+  if (syncError) document.getElementById("game-message").textContent = "Ouch. " + syncError.message;
+  else showResult(data);
+};
+
+document.getElementById("test-rewatch").onclick = () => {
+  document.getElementById("result").hidden = true;
+  document.getElementById("guess").hidden = true;
+  document.getElementById("submit").disabled = false;
+  document.getElementById("feed").hidden = false;
+  document.getElementById("watching").hidden = false;
+  buildSlides();
+  current = 0;
+  showVideo();
+};
+
+document.getElementById("test-reset").onclick = async () => {
+  const { data: n, error: resetError } = await supabase.rpc("reset_my_guesses");
+  if (resetError) { document.getElementById("game-message").textContent = "Ouch. " + resetError.message; return; }
+  myLikes = {};
+  await supabase.from("likes").delete().eq("profile_id", session.user.id);
+  document.getElementById("guess-slider").value = 100;
+  document.getElementById("guess-slider").oninput();
+  document.getElementById("game-message").textContent = `Reset ${n} guess(es) and your likes. Press next person.`;
+};
 
 
 // ---------- like / dislike (likes tablosu) ----------
