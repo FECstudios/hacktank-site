@@ -8,3 +8,6 @@ export const SCOPES = "user.info.basic,user.info.profile";
 // Supabase: publishable anahtar herkese açık olabilir, güvenliği RLS sağlıyor.
 export const SUPABASE_URL = "https://kgqisatstiybsbwsotug.supabase.co";
 export const SUPABASE_KEY = "sb_publishable_FK6ajXGFCBxqsEuFteYFoA_rfJM-rqH";
+
+// APIFY
+export const FETCH_REPOSTS_URL = "https://kgqisatstiybsbwsotug.supabase.co/functions/v1/fetch-reposts";
