@@ -13,7 +13,16 @@
 </main>
 
 <script type="module">
-    import { EXCHANGE_URL } from "./config.js";
+                  // Supabase kütüphanesini internetten yüklemek:
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+                // config.js'ten adresi ve anahtarı almak:
+    import { SUPABASE_URL, SUPABASE_KEY, EXCHANGE_URL } from "./config.js";
+
+                // Supabase'e bağlanmak:
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data: { session } } = await supabase.auth.getSession();
+
 
     const box = document.getElementById("status");
     const params = new URLSearchParams(location.search);
@@ -26,8 +35,9 @@
 
     const expectedState = sessionStorage.getItem("tiktok_state");
     sessionStorage.removeItem("tiktok_state");
-
-    if (params.get("error")) {
+    if (!session || !session.access_token) {
+        location.href = "login.html";
+    } else if (params.get("error")) {
       fail(params.get("error_description") || params.get("error"));
     } else if (!params.get("code")) {
       fail("No authorization code was returned.");
@@ -35,9 +45,12 @@
       fail("Security check failed (state mismatch). Please start again.");
     } else {
       try {
+
+    
+
         const res = await fetch(EXCHANGE_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" , "Authorization": "Bearer " + session.access_token},
           body: JSON.stringify({ code: params.get("code") }),
         });
         const data = await res.json();
