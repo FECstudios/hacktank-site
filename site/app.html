@@ -35,7 +35,7 @@
 
 <script type="module">
 import { REDIRECT_URI, SCOPES, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
-let current = 0;
+
                 // Supabase kütüphanesini internetten yüklemek:
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -65,8 +65,16 @@ document.getElementById("my-avatar").src = me.avatar_url
 
 let targetId = null;
 let videos= [];
+let current = 0;
+
+function showVideo() {
+  document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
+  document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
+}
+
+
 document.getElementById("start").onclick = async () => {
-  const { data, rpcError } = await supabase.rpc("next_target");
+  const { data, error: rpcError } = await supabase.rpc("next_target");
 if(rpcError){
     document.getElementById("game-message").textContent =  "Ouch. " + rpcError.message
     console.log(rpcError)
@@ -84,7 +92,7 @@ if(rpcError){
       showVideo();
     }}}
 document.getElementById("next").onclick = async () => {
-  if(current != 9){
+  if(current != videos.length - 1){
       current++
       showVideo();
   }else{
@@ -104,10 +112,7 @@ document.getElementById("prev").onclick = async () => {
 };
 }
 
-function showVideo() {
-  document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
-  document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
-}
+
 
 
 </script>
