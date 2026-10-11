@@ -3,53 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Connect TikTok – tiq</title>
-<link rel="stylesheet" href="style.css">
+<title>tiq</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Squada+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
-<main>      
+<div class="app" id="app">
 
-<aside class="card">
-  <img id="my-avatar" width="64" height="64" alt="">
-  <div id="my-username"></div>
-  <div>IQ: <b id="my-iq">iq</b></div>
-</aside>
-
-<section class="card" id="game">
-  <button id="start">Start</button>
-  <p id="game-message"></p>
-
-  <div id="feed" hidden>
-    <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
-    <div>
-      <button id="prev">↑ Previous</button>
-      <span id="counter"></span>
-      <button id="next">↓ Next</button>
+  <!-- Sol panel (mobilde alt çubuk) -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="logo">tiq.</div>
+      <button class="burger" id="menu" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
+
+    <div class="me">
+      <img id="my-avatar" alt="">
+      <div class="me-text">
+        <div id="my-username"></div>
+        <div>IQ: <span id="my-iq"></span></div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button id="nav-settings">settings</button>
+      <button id="nav-profile">profile</button>
+      <button id="nav-history">history</button>
+    </nav>
+    <button class="logout" id="logout">logout</button>
+  </aside>
+
+  <!-- Oyun alanı -->
+  <main class="stage" id="game">
+    <div class="watching" id="watching" hidden>watching reposts of a hidden player</div>
+    <p class="message" id="game-message"></p>
+
+    <!-- Başlangıç -->
+    <div class="start-card" id="start-card">
+      <h1>Guess their IQ.</h1>
+      <p>Watch 10 reposts of a hidden player, then guess.</p>
+      <button class="pill" id="start">start</button>
+    </div>
+
+    <!-- Videolar -->
+    <div class="feed" id="feed" hidden>
+      <div class="video-box">
+        <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
+      </div>
+      <div class="actions">
+        <button class="square" id="like">like</button>
+        <button class="square" id="dislike">dislike</button>
+        <button class="square" id="open-tt" title="View on TikTok">tt</button>
+      </div>
+      <div class="arrows">
+        <div class="counter" id="counter"></div>
+        <button class="arrow" id="prev" aria-label="Previous">up</button>
+        <button class="arrow" id="next" aria-label="Next">down</button>
+      </div>
+    </div>
+
+    <!-- Tahmin -->
+    <div class="target" id="guess" hidden>
+      <div class="avatar-big hidden-avatar">?</div>
+      <div class="target-name">@hidden</div>
+      <div class="guess-label">Guess their IQ</div>
+      <div class="slider-wrap">
+        <input class="slider" type="range" id="guess-slider" min="0" max="200" value="100" aria-label="Your guess">
+        <div class="slider-marks"><span>0</span><span>100</span><span>200</span></div>
+        <div class="slider-value" id="guess-value">100</div>
+      </div>
+      <div class="submit-row"><button class="pill" id="submit">submit</button></div>
+    </div>
+
+    <!-- Sonuç -->
+    <div class="target" id="result" hidden>
+      <img class="avatar-big" id="result-avatar" alt="">
+      <div class="target-name" id="result-username"></div>
+      <div class="result-text">
+        Their IQ was <span id="result-iq"></span>
+        <small id="result-detail"></small>
+      </div>
+      <button class="pill" id="next-person">next person</button>
+    </div>
+  </main>
+</div>
+
+<!-- Ayarlar -->
+<div class="modal" id="settings" hidden>
+  <div class="modal-card">
+    <h2>settings</h2>
+    <button class="danger" id="delete-account">delete my account</button>
+    <button class="ghost" id="close-settings">close</button>
   </div>
-
-  <div id="guess" hidden>
-    <p>You've watched all the videos! Try to guess their IQ.</p>
-    <input type="range" id="guess-slider" min="0" max="200" value="100">
-    <p>Your selection: <b id="guess-value">100</b></p>
-    <button id="submit">SUBMIT</button>
-  </div>
-
-  <div id="result" hidden>
-    <img id="result-avatar" width="96" height="96" alt="">
-    <h2 id="result-username"></h2>
-    <p>Their IQ was <b id="result-iq"></b></p>
-    <p id="result-detail"></p>
-    <button id="next-person">NEXT PERSON</button>
-  </div>
-
-
-</section>  
-
-</main>
+</div>
 
 <script type="module">
-import { REDIRECT_URI, SCOPES, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
+import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 
                 // Supabase kütüphanesini internetten yüklemek:
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -63,7 +114,7 @@ const { data: { session } } = await supabase.auth.getSession();
         location.href = "login.html";
   }else {
 
-  
+
 const { data: me, error } = await supabase
   .from("profiles")
   .select("tiktok_username, avatar_url, iq")
@@ -75,16 +126,18 @@ if(!me.tiktok_username){
 }else{
 
 document.getElementById("my-username").textContent = "@"+me.tiktok_username
-document.getElementById("my-iq").textContent = me.iq
+document.getElementById("my-iq").textContent = Math.round(me.iq)
 document.getElementById("my-avatar").src = me.avatar_url
 
 let targetId = null;
 let videos= [];
 let current = 0;
+let myLikes = {};   // video_id -> 1 (like) / -1 (dislike)
 
 function showVideo() {
   document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
   document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
+  updateLikeButtons();
 }
 
 // TikTok player'dan gelen mesajları dinle.
@@ -112,17 +165,30 @@ if(rpcError){
     console.log(rpcError)
 }else{
     if(data == null || !data) {
+      document.getElementById("start-card").hidden = false;
+      document.getElementById("watching").hidden = true;
       document.getElementById("game-message").textContent =  "That is it for today! Invite new people to grow the video pool!"
     }else{
       //let the games begin.
       targetId = data.target_id;
       videos = data.videos;
-      document.getElementById("game-message").textContent = videos.length + " videos loaded!"
+      document.getElementById("game-message").textContent = ""
       console.log(videos);
       current = 0
+      await loadMyLikes();
+      document.getElementById("start-card").hidden = true;
+      document.getElementById("watching").hidden = false;
       document.getElementById("feed").hidden = false;
       showVideo();
     }}}
+
+document.getElementById("guess-slider").oninput = () => {
+  const slider = document.getElementById("guess-slider");
+  document.getElementById("guess-value").textContent = slider.value;
+  slider.parentElement.style.setProperty("--p", slider.value / 200);   // slider dolgusu ve sayı balonu
+  slider.style.setProperty("--p", slider.value / 200);
+};
+
 document.getElementById("next").onclick = async () => {
   if (current !== videos.length - 1) {
     current++;
@@ -131,46 +197,41 @@ document.getElementById("next").onclick = async () => {
     document.getElementById("player").src = "";
     document.getElementById("feed").hidden = true;
     document.getElementById("guess").hidden = false;
-
-    document.getElementById("guess-slider").oninput = () => {
-      document.getElementById("guess-value").textContent =
-        document.getElementById("guess-slider").value;
-    };
-
-    document.getElementById("submit").onclick = async () => {
-      document.getElementById("submit").disabled = true
-      const { data, error: guessError } = await supabase.rpc("submit_guess", {
-        p_target: targetId,
-        p_guess: Number(document.getElementById("guess-slider").value),
-      });
-      
-      if (guessError) {
-        
-        console.log(guessError);
-        document.getElementById("game-message").textContent = "Ouch. " + guessError.message;
-        document.getElementById("submit").disabled = false
-      } else {
-        
-        document.getElementById("game-message").textContent = "Guess submitted!";
-        document.getElementById("guess").hidden = true
-        document.getElementById("result").hidden = false
-        console.log(data)
-        document.getElementById("result-avatar").src = data.avatar_url
-        document.getElementById("result-username").textContent = "@" + data.tiktok_username
-        document.getElementById("result-iq").textContent = data.target_iq_before
-        if (data.counted == false){
-            document.getElementById("result-detail").textContent = "Your guess was too far off, so it didn’t count."
-        }else if(0 > data.delta){
-            document.getElementById("result-detail").textContent = "Their IQ went down by " + Math.abs(data.delta) + " points"
-        }else if(data.delta ==  0){
-            document.getElementById("result-detail").textContent = "WoW spot on!"
-        }else if(data.delta > 0){
-            document.getElementById("result-detail").textContent = "Their IQ went up by " + data.delta + " points"
-        }
-      }
-    };
   }
 };
+
+document.getElementById("submit").onclick = async () => {
+  document.getElementById("submit").disabled = true
+  const { data, error: guessError } = await supabase.rpc("submit_guess", {
+    p_target: targetId,
+    p_guess: Number(document.getElementById("guess-slider").value),
+  });
+
+  if (guessError) {
+    console.log(guessError);
+    document.getElementById("game-message").textContent = "Ouch. " + guessError.message;
+    document.getElementById("submit").disabled = false
+  } else {
+    document.getElementById("game-message").textContent = "";
+    document.getElementById("watching").hidden = true
+    document.getElementById("guess").hidden = true
+    document.getElementById("result").hidden = false
+    console.log(data)
+    document.getElementById("result-avatar").src = data.avatar_url
+    document.getElementById("result-username").textContent = "@" + data.tiktok_username
+    document.getElementById("result-iq").textContent = data.target_iq_before
+    if (data.counted == false){
+        document.getElementById("result-detail").textContent = "Your guess was too far off, so it didn’t count."
+    }else if(0 > data.delta){
+        document.getElementById("result-detail").textContent = "Their IQ went down by " + Math.abs(data.delta) + " points"
+    }else if(data.delta ==  0){
+        document.getElementById("result-detail").textContent = "WoW spot on!"
+    }else if(data.delta > 0){
+        document.getElementById("result-detail").textContent = "Their IQ went up by " + data.delta + " points"
+    }
+  }
+};
+
 document.getElementById("prev").onclick = async () => {
   if(current != 0){
       current--
@@ -178,23 +239,88 @@ document.getElementById("prev").onclick = async () => {
   }else{
     console.log("first video already")
   }
-
 }
 
 document.getElementById("next-person").onclick = async () => {
   document.getElementById("result").hidden = true
   document.getElementById("guess-slider").value = 100
-  document.getElementById("guess-value").textContent = 100
-  document.getElementById("start").click();
+  document.getElementById("guess-slider").oninput();
   document.getElementById("submit").disabled = false
+  document.getElementById("start").click();
 }
+
+
+// ---------- like / dislike (likes tablosu) ----------
+async function loadMyLikes() {
+  myLikes = {};
+  const { data } = await supabase
+    .from("likes")
+    .select("video_id, value")
+    .in("video_id", videos.map((v) => v.video_id));
+  for (const row of data ?? []) myLikes[row.video_id] = row.value;
+}
+
+function updateLikeButtons() {
+  const value = myLikes[videos[current].video_id];
+  document.getElementById("like").classList.toggle("active", value === 1);
+  document.getElementById("dislike").classList.toggle("active", value === -1);
+}
+
+async function vote(value) {
+  const videoId = videos[current].video_id;
+  if (myLikes[videoId] === value) {
+    // aynı butona tekrar basınca geri al
+    delete myLikes[videoId];
+    updateLikeButtons();
+    await supabase.from("likes").delete().eq("profile_id", session.user.id).eq("video_id", videoId);
+  } else {
+    myLikes[videoId] = value;
+    updateLikeButtons();
+    await supabase.from("likes").upsert({ profile_id: session.user.id, video_id: videoId, value });
+  }
+}
+
+document.getElementById("like").onclick = () => vote(1);
+document.getElementById("dislike").onclick = () => vote(-1);
+
+document.getElementById("open-tt").onclick = () => {
+  const v = videos[current];
+  window.open(`https://www.tiktok.com/@${v.author}/video/${v.video_id}`, "_blank", "noopener");
+};
+
+
+// ---------- menü, ayarlar, çıkış ----------
+document.getElementById("menu").onclick = () => {
+  const app = document.getElementById("app");
+  if (matchMedia("(max-width: 800px)").matches) app.classList.toggle("menu-open");
+  else app.classList.toggle("collapsed");
+};
+
+document.getElementById("nav-settings").onclick = () => (document.getElementById("settings").hidden = false);
+document.getElementById("close-settings").onclick = () => (document.getElementById("settings").hidden = true);
+document.getElementById("nav-profile").onclick =
+document.getElementById("nav-history").onclick = () => {
+  document.getElementById("game-message").textContent = "Coming soon!";
+};
+
+document.getElementById("logout").onclick = async () => {
+  await supabase.auth.signOut();
+  location.href = "login.html";
+};
+
+document.getElementById("delete-account").onclick = async () => {
+  if (!confirm("Delete your tiq account and all your data? This can't be undone.")) return;
+  const { error: delError } = await supabase.rpc("delete_my_account");
+  if (delError) {
+    document.getElementById("game-message").textContent = "Ouch. " + delError.message;
+    return;
+  }
+  await supabase.auth.signOut();
+  location.href = "./";
+};
 
 };
 }
-
-
-
-
 </script>
 </body>
 </html>
