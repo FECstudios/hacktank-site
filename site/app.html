@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect TikTok – tiq</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>      
+
+<aside class="card">
+  <img id="my-avatar" width="64" height="64" alt="">
+  <div id="my-username"></div>
+  <div>IQ: <b id="my-iq">iq</b></div>
+</aside>
+
+
+</main>
+
+<script type="module">
+import { REDIRECT_URI, SCOPES, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
+
+                // Supabase kütüphanesini internetten yüklemek:
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+
+                // Supabase'e bağlanmak:
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const { data: { session } } = await supabase.auth.getSession();
+
+ if (!session || !session.access_token) {
+        location.href = "login.html";
+  }else {
+
+  
+
+const { data: me, error } = await supabase
+  .from("profiles")
+  .select("tiktok_username, avatar_url, iq")
+  .eq("id", session.user.id)
+  .single();
+
+document.getElementById("my-username").textContent = "@"+me.tiktok_username
+document.getElementById("my-iq").textContent = me.iq
+document.getElementById("my-avatar").src = me.avatar_url
+
+if(!me.tiktok_username){
+    location.href = "login.html";
+}else{
+
+    
+}
+}
+</script>
+</body>
+</html>
