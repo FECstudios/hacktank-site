@@ -48,7 +48,7 @@
 
                     const { error } = await supabase.auth.signInWithOtp({
                         email: document.getElementById("email").value,
-                        options: { emailRedirectTo: "https://fecstudios.github.io/hacktank-site/connect.html" },
+                        options: { emailRedirectTo: new URL("app.html", location.href).href },
                     });
                     if (error) {
                         console.log("ERR: " + error)

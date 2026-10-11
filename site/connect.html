@@ -42,6 +42,14 @@ const { data: { session } } = await supabase.auth.getSession();
         location.href = "login.html";
   } else {
 
+  // TikTok zaten bağlıysa tekrar sorma, doğrudan oyuna git
+  const { data: me } = await supabase
+    .from("profiles")
+    .select("tiktok_username")
+    .eq("id", session.user.id)
+    .single();
+  if (me?.tiktok_username) location.replace("app.html");
+
   document.getElementById("connect").onclick = () => {
   // CSRF koruması: rastgele state üret, dönüşte aynısı mı diye kontrol et
   const state = crypto.randomUUID();
