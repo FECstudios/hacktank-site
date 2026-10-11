@@ -15,6 +15,10 @@
   <div>IQ: <b id="my-iq">iq</b></div>
 </aside>
 
+<section class="card" id="game">
+  <button id="start">Start</button>
+  <p id="game-message"></p>
+</section>  
 
 </main>
 
@@ -34,23 +38,40 @@ const { data: { session } } = await supabase.auth.getSession();
   }else {
 
   
-
 const { data: me, error } = await supabase
   .from("profiles")
   .select("tiktok_username, avatar_url, iq")
   .eq("id", session.user.id)
   .single();
 
+if(!me.tiktok_username){
+    location.href = "connect.html";
+}else{
+
 document.getElementById("my-username").textContent = "@"+me.tiktok_username
 document.getElementById("my-iq").textContent = me.iq
 document.getElementById("my-avatar").src = me.avatar_url
 
-if(!me.tiktok_username){
-    location.href = "login.html";
+let targetId = null;
+let videos= [];
+document.getElementById("start").onclick = async () => {
+  const { data, rpcError } = await supabase.rpc("next_target");
+if(rpcError){
+    document.getElementById("game-message").textContent =  "Ouch. " + rpcError.message
+    console.log(rpcError)
 }else{
+    if(data == null || !data) {
+      document.getElementById("game-message").textContent =  "That is it for today! Invite new people to grow the video pool!"
+    }else{
+      //let the games begin.
+      targetId = data.target_id;
+      videos = data.videos;
+      document.getElementById("game-message").textContent = videos.length + " videos loaded!"
+      console.log(videos);
 
-    
-}
+
+    }}}
+};
 }
 </script>
 </body>
