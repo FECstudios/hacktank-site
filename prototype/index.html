@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repost İzleyici</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: #000; color: #fff; font-family: system-ui, sans-serif; }
+
+  #setup { max-width: 640px; margin: 0 auto; padding: 32px 20px; }
+  #setup h1 { font-size: 28px; margin-bottom: 8px; }
+  #setup p { color: #aaa; line-height: 1.5; margin-bottom: 16px; }
+  #setup ol { color: #ccc; line-height: 1.7; margin: 0 0 16px 20px; }
+  textarea { width: 100%; height: 160px; background: #111; color: #fff; border: 1px solid #333;
+             border-radius: 10px; padding: 12px; font: 13px ui-monospace, monospace; }
+  .row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  button { background: #fe2c55; color: #fff; border: 0; border-radius: 8px; padding: 12px 18px;
+           font-weight: 600; font-size: 15px; cursor: pointer; }
+  button.secondary { background: #222; }
+  #status { margin-top: 10px; color: #aaa; font-size: 14px; }
+
+  #feed { display: none; height: 100dvh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+  .slide { height: 100dvh; scroll-snap-align: start; display: grid; place-items: center; position: relative; }
+  .slide iframe { width: min(100vw, calc(100dvh * 9 / 16)); height: 100dvh; border: 0; }
+  .counter { position: fixed; top: 14px; left: 14px; background: #0008; padding: 6px 12px;
+             border-radius: 20px; font-size: 14px; z-index: 2; }
+  #back { position: fixed; top: 10px; right: 14px; z-index: 2; padding: 8px 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<section id="setup">
+  <h1>Repost İzleyici</h1>
+  <p>Bir profilin repost'larını topla, buraya yapıştır, TikTok gibi izle.</p>
+  <ol>
+    <li>Bilgisayarda TikTok'u aç, profile git, <b>Reposts</b> sekmesine tıkla.</li>
+    <li><kbd>F12</kbd> → Console sekmesi. Aşağıdaki toplayıcı script'i yapıştır, Enter.</li>
+    <li>Sayfa kendi kendine kayar. Bitince linkler panoya kopyalanır.</li>
+    <li>Buraya yapıştır ve <b>İzle</b>'ye bas.</li>
+  </ol>
+  <div class="row"><button class="secondary" id="copyCollector">Toplayıcı script'i kopyala</button></div>
+
+  <textarea id="links" placeholder="TikTok video linklerini buraya yapıştır (her türlü metin olur, video ID'leri otomatik bulunur)"></textarea>
+  <div class="row">
+    <button id="watch">İzle</button>
+    <button class="secondary" id="clear">Temizle</button>
+  </div>
+  <div id="status"></div>
+</section>
+
+<div id="feed"></div>
+<div class="counter" id="counter" hidden></div>
+<button class="secondary" id="back" hidden>← Geri</button>
+
+<script>
+// TikTok'un Reposts sekmesinde konsolda çalışan toplayıcı.
+// tiktok-to-ytdlp ile aynı fikir: kaydır, [data-e2e=user-repost-item] içindeki /video/ linklerini topla.
+const COLLECTOR = `(async () => {
+  const links = new Set();
+  const grab = () => document.querySelectorAll('[data-e2e="user-repost-item"] a[href*="/video/"]')
+    .forEach(a => links.add(a.href.split("?")[0]));
+  let same = 0, last = -1;
+  while (same < 4) {
+    grab();
+    window.scrollTo(0, document.body.scrollHeight);
+    await new Promise(r => setTimeout(r, 1500 + Math.random() * 1000));
+    same = links.size === last ? same + 1 : 0;
+    last = links.size;
+    console.log("Toplanan repost:", links.size);
+  }
+  const text = [...links].join("\\n");
+  copy(text);
+  console.log("Bitti! " + links.size + " link panoya kopyalandı.");
+})();`;
+
+const $ = (id) => document.getElementById(id);
+const PLAYER = (id) =>
+  `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=1&description=0&music_info=0&rel=0&progress_bar=1&timestamp=0`;
+
+function extractIds(text) {
+  const ids = [...text.matchAll(/(?:\/video\/|\/photo\/|^|\s)(\d{15,21})(?!\d)/gm)].map((m) => m[1]);
+  return [...new Set(ids)];
+}
+
+function send(iframe, type) {
+  iframe?.contentWindow?.postMessage({ type, value: null, "x-tiktok-player": true }, "https://www.tiktok.com");
+}
+
+function buildFeed(ids) {
+  const feed = $("feed");
+  feed.innerHTML = "";
+  ids.forEach((id, i) => {
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.dataset.id = id;
+    slide.dataset.index = i;
+    feed.append(slide);
+  });
+
+  // Sadece görünen video ve komşuları yüklensin; görünmeyenler durdurulup kaldırılsın.
+  const observer = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const slide = e.target;
+      if (e.isIntersecting && e.intersectionRatio > 0.6) {
+        const i = Number(slide.dataset.index);
+        $("counter").textContent = `${i + 1} / ${ids.length}`;
+        for (const s of feed.children) {
+          const d = Math.abs(Number(s.dataset.index) - i);
+          const iframe = s.querySelector("iframe");
+          if (d <= 1 && !iframe) {
+            const f = document.createElement("iframe");
+            f.src = PLAYER(s.dataset.id);
+            f.allow = "autoplay; fullscreen; encrypted-media";
+            s.append(f);
+          } else if (d > 1 && iframe) {
+            iframe.remove();
+          } else if (d === 1) {
+            send(iframe, "pause");
+          }
+        }
+        send(slide.querySelector("iframe"), "play");
+      }
+    }
+  }, { root: feed, threshold: [0.6] });
+
+  [...feed.children].forEach((s) => observer.observe(s));
+}
+
+$("watch").onclick = () => {
+  const ids = extractIds($("links").value);
+  if (!ids.length) { $("status").textContent = "Hiç video linki bulunamadı."; return; }
+  localStorage.setItem("repost-links", $("links").value);
+  $("setup").style.display = "none";
+  $("feed").style.display = "block";
+  $("counter").hidden = $("back").hidden = false;
+  buildFeed(ids);
+};
+
+$("back").onclick = () => {
+  $("feed").style.display = "none";
+  $("feed").innerHTML = "";
+  $("setup").style.display = "block";
+  $("counter").hidden = $("back").hidden = true;
+};
+
+$("clear").onclick = () => { $("links").value = ""; localStorage.removeItem("repost-links"); updateStatus(); };
+
+$("copyCollector").onclick = async () => {
+  await navigator.clipboard.writeText(COLLECTOR);
+  $("copyCollector").textContent = "Kopyalandı ✓";
+  setTimeout(() => ($("copyCollector").textContent = "Toplayıcı script'i kopyala"), 2000);
+};
+
+function updateStatus() {
+  const n = extractIds($("links").value).length;
+  $("status").textContent = n ? `${n} video bulundu.` : "";
+}
+$("links").oninput = updateStatus;
+$("links").value = localStorage.getItem("repost-links") ?? "";
+updateStatus();
+
+// Ok tuşlarıyla gezinme
+addEventListener("keydown", (e) => {
+  if ($("feed").style.display !== "block") return;
+  if (e.key === "ArrowDown") $("feed").scrollBy({ top: innerHeight, behavior: "smooth" });
+  if (e.key === "ArrowUp") $("feed").scrollBy({ top: -innerHeight, behavior: "smooth" });
+});
+</script>
+</body>
+</html>

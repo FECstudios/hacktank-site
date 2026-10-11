@@ -1,0 +1,20 @@
+# Bağımlılıklar
+node_modules/
+
+# Kişisel veri içeren test çıktıları (başkasının profili / repostları)
+scraper/debug.png
+scraper/d_r.1.n.json
+
+# Ayrı bir repo (FECstudios.github.io)
+root-site/
+
+# Supabase CLI'ın yerel geçici dosyaları
+supabase/.temp/
+supabase/.branches/
+
+# Ortam değişkenleri / secret'lar
+.env
+.env.*
+
+# Yerel araç ayarları
+.claude/

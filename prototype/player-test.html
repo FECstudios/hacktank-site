@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TikTok Embed Player Test</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0b0b0b; color: #eee; font: 14px/1.5 system-ui, sans-serif; }
+  .wrap { display: grid; grid-template-columns: 340px 1fr 360px; gap: 20px; padding: 20px; height: 100vh; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: #888; margin: 18px 0 8px; }
+  input[type=text], input[type=number] { width: 100%; background: #151515; color: #fff; border: 1px solid #333; border-radius: 6px; padding: 8px; }
+  label { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  button { background: #222; color: #fff; border: 1px solid #333; border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+  button:hover { background: #2c2c2c; }
+  button.primary { background: #fe2c55; border-color: #fe2c55; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .stage { display: grid; place-items: center; background: #050505; border-radius: 12px; }
+  iframe { width: min(100%, calc((100vh - 40px) * 9 / 16)); height: calc(100vh - 40px); border: 0; border-radius: 12px; }
+  #log { height: calc(100vh - 200px); overflow: auto; background: #050505; border: 1px solid #222; border-radius: 8px;
+         padding: 8px; font: 12px ui-monospace, monospace; white-space: pre-wrap; }
+  .ev { color: #8fd; } .cmd { color: #fc6; } .err { color: #f66; }
+  #state { font-size: 13px; }
+  #state b { color: #fff; }
+  .muted { color: #777; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section>
+    <h1>TikTok Embed Player Test</h1>
+
+    <h2>Video</h2>
+    <input id="vid" type="text" value="6718335390845095173" placeholder="Video ID veya TikTok linki">
+    <div class="row">
+      <button data-id="6718335390845095173">Örnek 1</button>
+      <button data-id="7672697662709189902">Örnek 2</button>
+      <button data-id="1">Geçersiz ID</button>
+    </div>
+
+    <h2>URL parametreleri</h2>
+    <div id="params"></div>
+    <div class="row"><button class="primary" id="load">Yükle</button></div>
+
+    <h2>Komutlar (postMessage)</h2>
+    <div class="row">
+      <button data-cmd="play">play</button>
+      <button data-cmd="pause">pause</button>
+      <button data-cmd="mute">mute</button>
+      <button data-cmd="unMute">unMute</button>
+    </div>
+    <div class="row">
+      <input id="seek" type="number" value="5" min="0" style="width:80px">
+      <button id="seekBtn">seekTo (sn)</button>
+    </div>
+
+    <h2>Durum</h2>
+    <div id="state">
+      <div>Hazır: <b id="sReady">hayır</b></div>
+      <div>Durum: <b id="sState">-</b></div>
+      <div>Süre: <b id="sTime">-</b></div>
+      <div>Ses: <b id="sMute">-</b></div>
+    </div>
+  </section>
+
+  <section class="stage"><iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe></section>
+
+  <section>
+    <h1>Olay günlüğü</h1>
+    <div class="row" style="margin-bottom:8px">
+      <label><input type="checkbox" id="showTime"> onCurrentTime göster</label>
+      <button id="clear">Temizle</button>
+    </div>
+    <div id="log"></div>
+    <p class="muted">Sarı: gönderilen komut · Yeşil: player'dan gelen olay · Kırmızı: hata</p>
+  </section>
+</div>
+
+<script>
+const PARAMS = [
+  // [ad, varsayılan, açıklama]
+  ["autoplay", 1, "otomatik oynat"],
+  ["loop", 1, "döngü"],
+  ["muted", 0, "sessiz başla (ses değiştirilemez)"],
+  ["controls", 1, "tüm kontroller"],
+  ["progress_bar", 1, "ilerleme çubuğu"],
+  ["play_button", 1, "oynat butonu"],
+  ["volume_control", 1, "ses butonu"],
+  ["fullscreen_button", 1, "tam ekran butonu"],
+  ["timestamp", 1, "süre göstergesi"],
+  ["music_info", 0, "müzik bilgisi"],
+  ["description", 0, "açıklama"],
+  ["rel", 0, "ilgili videolar (0 = yazarın videoları)"],
+  ["native_context_menu", 1, "sağ tık menüsü"],
+  ["closed_caption", 1, "altyazı butonu"],
+];
+const STATES = { "-1": "başlatılıyor", 0: "bitti", 1: "oynuyor", 2: "duraklatıldı", 3: "yükleniyor" };
+const ORIGIN = "https://www.tiktok.com";
+
+const $ = (id) => document.getElementById(id);
+const player = $("player");
+
+$("params").innerHTML = PARAMS.map(([name, def, desc]) =>
+  `<label><input type="checkbox" data-param="${name}" ${def ? "checked" : ""}> <code>${name}</code> <span class="muted">${desc}</span></label>`
+).join("");
+
+function log(cls, text) {
+  const line = document.createElement("div");
+  line.className = cls;
+  line.textContent = `${new Date().toLocaleTimeString()}  ${text}`;
+  $("log").prepend(line);
+}
+
+function videoId() {
+  const v = $("vid").value.trim();
+  return v.match(/(\d{15,21})/)?.[1] ?? v;
+}
+
+function buildUrl() {
+  const qs = new URLSearchParams();
+  document.querySelectorAll("[data-param]").forEach((c) => qs.set(c.dataset.param, c.checked ? "1" : "0"));
+  return `${ORIGIN}/player/v1/${videoId()}?${qs}`;
+}
+
+function load() {
+  $("sReady").textContent = "hayır";
+  $("sState").textContent = $("sTime").textContent = $("sMute").textContent = "-";
+  player.src = buildUrl();
+  log("cmd", `YÜKLE ${player.src}`);
+}
+
+function send(type, value) {
+  player.contentWindow?.postMessage({ type, value, "x-tiktok-player": true }, ORIGIN);
+  log("cmd", `→ ${type}${value !== undefined ? " " + JSON.stringify(value) : ""}`);
+}
+
+addEventListener("message", (e) => {
+  if (e.origin !== ORIGIN) return;
+  let data = e.data;
+  if (typeof data === "string") { try { data = JSON.parse(data); } catch { return; } }
+  if (!data?.["x-tiktok-player"]) return;
+
+  const { type, value } = data;
+  switch (type) {
+    case "onPlayerReady":
+      $("sReady").textContent = "evet";
+      break;
+    case "onStateChange":
+      $("sState").textContent = `${STATES[value] ?? "?"} (${value})`;
+      break;
+    case "onCurrentTime":
+      $("sTime").textContent = `${value.currentTime.toFixed(1)} / ${value.duration.toFixed(1)} sn`;
+      if (!$("showTime").checked) return;
+      break;
+    case "onMute":
+      $("sMute").textContent = value ? "kapalı" : "açık";
+      break;
+  }
+  const isErr = type === "onPlayerError" || type === "onError";
+  log(isErr ? "err" : "ev", `← ${type} ${value === undefined ? "" : JSON.stringify(value)}`);
+});
+
+document.querySelectorAll("[data-id]").forEach((b) => (b.onclick = () => { $("vid").value = b.dataset.id; load(); }));
+document.querySelectorAll("[data-cmd]").forEach((b) => (b.onclick = () => send(b.dataset.cmd)));
+$("seekBtn").onclick = () => send("seekTo", Number($("seek").value));
+$("load").onclick = load;
+$("clear").onclick = () => ($("log").innerHTML = "");
+
+load();
+</script>
+</body>
+</html>
