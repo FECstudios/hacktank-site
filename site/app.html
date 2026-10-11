@@ -51,7 +51,6 @@
     <div class="feed" id="feed" hidden>
       <div class="video-box">
         <div class="slides" id="slides"></div>
-        <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
       </div>
       <div class="actions">
         <button class="square" id="like" aria-label="Like" title="Like">
@@ -145,12 +144,40 @@ let videos= [];
 let current = 0;
 let myLikes = {};   // video_id -> 1 (like) / -1 (dislike)
 
+// Aktif video + bir önceki + bir sonraki aynı anda yüklenir (paralel), diğerleri kaldırılır.
+// Aktif olanın id'si "player" olur; komşular durdurulmuş halde hazır bekler.
+const PRELOAD = 1;
+function videoUrl(i, autoplay) {
+  return `https://www.tiktok.com/player/v1/${videos[i].video_id}?autoplay=${autoplay ? 1 : 0}&loop=1&description=0&music_info=0&rel=0`;
+}
+function post(frame, type) {
+  frame?.contentWindow?.postMessage({ type, "x-tiktok-player": true }, "https://www.tiktok.com");
+}
 function showVideo() {
-  const slide = document.getElementById("slides").children[current];
-  if (slide && document.getElementById("player").parentElement !== slide) slide.append(document.getElementById("player"));
   document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
-  document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
+  const slides = document.getElementById("slides").children;
+  for (let i = 0; i < videos.length; i++) {
+    let frame = slides[i].querySelector("iframe");
+    const near = Math.abs(i - current) <= PRELOAD;
+    if (near && !frame) {
+      frame = document.createElement("iframe");
+      frame.allow = "autoplay; fullscreen; encrypted-media";
+      frame.src = videoUrl(i, i === current);
+      slides[i].append(frame);
+    } else if (!near && frame) {
+      frame.remove();
+      frame = null;
+    }
+    if (frame) {
+      frame.id = i === current ? "player" : "";
+      if (i === current) { post(frame, "unMute"); post(frame, "play"); }
+      else post(frame, "pause");
+    }
+  }
   updateLikeButtons();
+}
+function stopAllVideos() {
+  document.querySelectorAll("#slides iframe").forEach((f) => f.remove());
 }
 
 // TikTok player'dan gelen mesajları dinle.
@@ -164,8 +191,10 @@ window.addEventListener("message", (event) => {
   }
   if (!msg || !msg["x-tiktok-player"]) return;
 
-  if (msg.type === "onPlayerReady") {
-    const player = document.getElementById("player").contentWindow;
+  // Komşu videolar da "hazırım" der; sadece ekrandaki (aktif) video sesli oynasın.
+  const active = document.getElementById("player");
+  if (msg.type === "onPlayerReady" && active && event.source === active.contentWindow) {
+    const player = active.contentWindow;
     player.postMessage({ type: "unMute", "x-tiktok-player": true }, "https://www.tiktok.com");
     player.postMessage({ type: "play", "x-tiktok-player": true }, "https://www.tiktok.com");
   }
@@ -207,7 +236,7 @@ document.getElementById("next").onclick = async () => {
   if (current !== videos.length - 1) {
     goTo(current + 1);
   } else {
-    document.getElementById("player").src = "";
+    stopAllVideos();
     document.getElementById("feed").hidden = true;
     document.getElementById("guess").hidden = false;
   }
@@ -269,6 +298,7 @@ const slidesEl = document.getElementById("slides");
 let playing = true;
 
 function buildSlides() {
+  stopAllVideos();
   slidesEl.innerHTML = "";
   videos.forEach((v, i) => {
     const slide = document.createElement("div");
@@ -305,11 +335,11 @@ function syncToScroll() {
   if (buttonScroll) return;
   const i = Math.round(slidesEl.scrollTop / slidesEl.clientHeight);
   if (i >= videos.length) {                       // en alttaki "guess" slaytı
-    document.getElementById("player").src = "";
+    stopAllVideos();
     document.getElementById("counter").textContent = "done";
     return;
   }
-  if (i !== current || !document.getElementById("player").src.includes(videos[i].video_id)) {
+  if (i !== current || !document.getElementById("player")) {
     current = i;
     showVideo();
   }
@@ -318,7 +348,7 @@ const observer = new IntersectionObserver(syncToScroll, { root: slidesEl, thresh
 slidesEl.addEventListener("scrollend", syncToScroll);
 
 function sendToPlayer(type) {
-  document.getElementById("player").contentWindow?.postMessage({ type, "x-tiktok-player": true }, "https://www.tiktok.com");
+  post(document.getElementById("player"), type);
 }
 
 function togglePlay() {
@@ -330,7 +360,7 @@ window.addEventListener("message", (event) => {
   if (event.origin !== "https://www.tiktok.com") return;
   let msg = event.data;
   if (typeof msg === "string") { try { msg = JSON.parse(msg); } catch { return; } }
-  if (msg?.["x-tiktok-player"] && msg.type === "onStateChange") playing = msg.value === 1 || msg.value === 3;
+  if (msg?.["x-tiktok-player"] && msg.type === "onStateChange" && event.source === document.getElementById("player")?.contentWindow) playing = msg.value === 1 || msg.value === 3;
 });
 
 
