@@ -20,14 +20,20 @@
   <p id="game-message"></p>
 
   <div id="feed" hidden>
-  <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
-  <div>
-    <button id="prev">↑ Previous</button>
-    <span id="counter"></span>
-    <button id="next">↓ Next</button>
+    <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
+    <div>
+      <button id="prev">↑ Previous</button>
+      <span id="counter"></span>
+      <button id="next">↓ Next</button>
+    </div>
   </div>
-</div>
 
+  <div id="guess" hidden>
+    <p>You've watched all the videos! Try to guess their IQ.</p>
+    <input type="range" id="guess-slider" min="0" max="200" value="100">
+    <p>Your selection: <b id="guess-value">100</b></p>
+    <button id="submit">SUBMIT</button>
+  </div>
 
 </section>  
 
@@ -72,6 +78,23 @@ function showVideo() {
   document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
 }
 
+// TikTok player'dan gelen mesajları dinle.
+// Player hazır olunca sesi aç ve oynat (Start'a tıklandığı için tarayıcı sese izin veriyor).
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://www.tiktok.com") return;   // sadece TikTok'tan gelenler
+
+  let msg = event.data;
+  if (typeof msg === "string") {
+    try { msg = JSON.parse(msg); } catch { return; }
+  }
+  if (!msg || !msg["x-tiktok-player"]) return;
+
+  if (msg.type === "onPlayerReady") {
+    const player = document.getElementById("player").contentWindow;
+    player.postMessage({ type: "unMute", "x-tiktok-player": true }, "https://www.tiktok.com");
+    player.postMessage({ type: "play", "x-tiktok-player": true }, "https://www.tiktok.com");
+  }
+});
 
 document.getElementById("start").onclick = async () => {
   const { data, error: rpcError } = await supabase.rpc("next_target");
@@ -92,13 +115,37 @@ if(rpcError){
       showVideo();
     }}}
 document.getElementById("next").onclick = async () => {
-  if(current != videos.length - 1){
-      current++
-      showVideo();
-  }else{
-    //BİTTİ.  
+  if (current !== videos.length - 1) {
+    current++;
+    showVideo();
+  } else {
+    document.getElementById("player").src = "";
+    document.getElementById("feed").hidden = true;
+    document.getElementById("guess").hidden = false;
+
+    document.getElementById("guess-slider").oninput = () => {
+      document.getElementById("guess-value").textContent =
+        document.getElementById("guess-slider").value;
+    };
+
+    document.getElementById("submit").onclick = async () => {
+      document.getElementById("submit").disabled = true
+      const { data, error: guessError } = await supabase.rpc("submit_guess", {
+        p_target: targetId,
+        p_guess: Number(document.getElementById("guess-slider").value),
+      });
+      
+      if (guessError) {
+        
+        console.log(guessError);
+        document.getElementById("game-message").textContent = "Ouch. " + guessError.message;
+      } else {
+        
+        document.getElementById("game-message").textContent = "Guess submitted!";
+      }
+    };
   }
-}
+};
 document.getElementById("prev").onclick = async () => {
   if(current != 0){
       current--
