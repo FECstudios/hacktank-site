@@ -14,9 +14,10 @@ export const COLORS = {
 };
 
 export const FPS = 30;
-// "HIGHS AND LOWS" analizi: ~95 BPM, ilk beat 0.035 sn, drop 12. beatte (≈7.6 sn).
-export const BPM = 95;
-export const BEAT = (60 / BPM) * FPS; // ≈18.95 kare (kesirli: kayma birikmesin diye)
+// "HUMBLE." analizi: 150 BPM (1 beat = 0.4 sn = tam 12 kare), drop 14.32. saniyede.
+// Video doğrudan drop'tan başlar ve 12 ölçü (48 beat) sonra ölçü sınırında biter → kusursuz loop.
+export const BPM = 150;
+export const BEAT = (60 / BPM) * FPS; // 12 kare
 export const b = (beats: number) => Math.round(beats * BEAT);
-export const AUDIO_FILE = "highs-and-lows.mp3";
-export const AUDIO_FIRST_BEAT_SEC = 0.035;
+export const AUDIO_FILE = "humble.mp3";
+export const AUDIO_START_SEC = 14.32;

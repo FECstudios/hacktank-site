@@ -10,7 +10,7 @@ const TRACK_H = 110;
 export const SliderScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const word2 = b(1);
+  const word2 = b(2);
   const shake = useShake([0, word2], 22, 7);
 
   const s1 = spring({ frame, fps, config: { damping: 12, stiffness: 220 } });
@@ -19,16 +19,16 @@ export const SliderScene: React.FC = () => {
   const g2 = interpolate(frame - word2, [0, 6], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   // tutamak: kararsız gidip gelir, sonra 167'ye oturur
-  const p = interpolate(frame, [b(1.5), b(2.5), b(3.2), b(4), b(5)], [0.5, 0.2, 0.9, 0.78, 0.835], {
+  const p = interpolate(frame, [b(2.5), b(3.5), b(4.5), b(5.5), b(7)], [0.5, 0.2, 0.9, 0.78, 0.835], {
     easing: Easing.inOut(Easing.cubic),
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   const value = Math.round(p * 200);
-  const trackIn = spring({ frame: frame - b(1), fps, config: { damping: 14 } });
+  const trackIn = spring({ frame: frame - b(2), fps, config: { damping: 14 } });
   const thumbX = p * (TRACK_W - TRACK_H);
-  const settle = spring({ frame: frame - b(5), fps, config: { damping: 8, stiffness: 300 } });
-  const thumbScale = frame >= b(5) ? interpolate(settle, [0, 1], [1.35, 1]) : 1;
+  const settle = spring({ frame: frame - b(7), fps, config: { damping: 8, stiffness: 300 } });
+  const thumbScale = frame >= b(7) ? interpolate(settle, [0, 1], [1.35, 1]) : 1;
 
   return (
     <AbsoluteFill style={{ background: COLORS.bg, alignItems: "center", justifyContent: "center", gap: 0 }}>

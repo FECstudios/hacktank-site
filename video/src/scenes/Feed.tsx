@@ -37,19 +37,19 @@ const Card: React.FC<{ i: number }> = ({ i }) => {
 
 export const Feed: React.FC = () => {
   const frame = useCurrentFrame();
-  const total = b(6);
+  const total = b(8);
   // yavaş başla, hızlan, ortada "ABOUT YOU." için yavaşla, sonra tekrar fırla
-  const progress = interpolate(frame, [0, b(2), b(3.5), total], [0, 1.2, 1.45, 4.2], {
+  const progress = interpolate(frame, [0, b(2), b(5), total], [0, 1.4, 1.7, 4.6], {
     easing: Easing.inOut(Easing.cubic),
     extrapolateRight: "clamp",
   });
   const y = -progress * (CARD_H + GAP);
-  const speed = Math.abs(interpolate(frame + 1, [0, b(2), b(3.5), total], [0, 1.2, 1.45, 4.2], { extrapolateRight: "clamp" }) - progress);
+  const speed = Math.abs(interpolate(frame + 1, [0, b(2), b(5), total], [0, 1.4, 1.7, 4.6], { extrapolateRight: "clamp" }) - progress);
   const blur = Math.min(18, speed * 260);
 
-  const textIn = b(2.5);
+  const textIn = b(2);
   const textGlitch = interpolate(frame, [textIn, textIn + 8], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const textOpacity = interpolate(frame, [textIn - 1, textIn, b(4.5), b(5)], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const textOpacity = interpolate(frame, [textIn - 1, textIn, b(6.5), b(7)], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const shake = useShake([textIn], 22, 8);
 
   return (

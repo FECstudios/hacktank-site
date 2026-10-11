@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS, b, fontFamily } from "../theme";
 import { GlitchText, useShake } from "../fx";
+import { CommentFlood } from "./Comments";
 
 // "tiq." logosu ekrana çarpar, sonra "soon." ve HackTank kartı.
 export const Logo: React.FC = () => {
@@ -12,9 +13,9 @@ export const Logo: React.FC = () => {
   const glitch = interpolate(frame, [0, 14, b(2), b(2) + 2, b(2) + 8], [1, 0.08, 0.08, 0.9, 0.05], { extrapolateRight: "clamp" });
   const shake = useShake([0, b(2)], 34, 10);
 
-  const soonAt = b(3);
+  const soonAt = b(2.5);
   const soon = spring({ frame: frame - soonAt, fps, config: { damping: 14 } });
-  const footer = interpolate(frame, [b(4.5), b(5.1)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const footer = interpolate(frame, [b(3.5), b(4)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const logoUp = interpolate(soon, [0, 1], [0, -150]);
 
   // arkadaki nabız gibi atan kırmızı ışık
@@ -64,6 +65,10 @@ export const Logo: React.FC = () => {
         }}
       >
         built for HackTank · a Hack Club program
+      </div>
+      {/* LOOP: son 2 beatte yorumlar ekranı yeniden doldurur, ilk kareye (yorum dolu ekran) bağlanır */}
+      <div style={{ position: "absolute", inset: 0, opacity: interpolate(frame, [b(6), b(7.5)], [0, 0.9], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
+        <CommentFlood appearFrom={b(6)} stagger={1} beatFrames={b(1)} />
       </div>
     </AbsoluteFill>
   );

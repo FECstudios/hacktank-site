@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useVideoConfig } from "remotion";
-import { AUDIO_FILE, AUDIO_FIRST_BEAT_SEC, COLORS, FPS, b } from "./theme";
+import { COLORS, FPS, b } from "./theme";
 import { Flash, Grain, Scanlines, Vignette } from "./fx";
 import { Intro } from "./scenes/Intro";
 import { Feed } from "./scenes/Feed";
@@ -10,11 +10,11 @@ import { Logo } from "./scenes/Logo";
 
 // Sahne uzunlukları beat cinsinden (theme.ts'deki BPM'e göre karelere çevrilir).
 export const SCENES = [
-  { name: "Intro", beats: 12, C: Intro },   // sakin giriş → 12. beatte DROP
-  { name: "Feed", beats: 6, C: Feed },
-  { name: "IQ", beats: 6, C: IqScramble },
-  { name: "Slider", beats: 6, C: SliderScene },
-  { name: "Logo", beats: 10, C: Logo },
+  { name: "Hook", beats: 16, C: Intro },   // DROP'ta başlar
+  { name: "Feed", beats: 8, C: Feed },
+  { name: "IQ", beats: 8, C: IqScramble },
+  { name: "Slider", beats: 8, C: SliderScene },
+  { name: "Logo", beats: 8, C: Logo },     // son 2 beat ilk kareye bağlanır (loop)
 ];
 export const TOTAL_BEATS = SCENES.reduce((s, x) => s + x.beats, 0);
 
@@ -46,13 +46,12 @@ export const Teaser: React.FC<TeaserProps> = ({ audio, audioStartSec }) => {
         <Audio
           src={staticFile(audio)}
           startFrom={Math.round(audioStartSec * FPS)}
-          // son 1.5 saniyede sesi yavaşça kıs
-          volume={(f) => interpolate(f, [durationInFrames - 45, durationInFrames - 1], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}
+          // fade yok: video ölçü sınırında biter, başa sarınca ritim kopmaz (loop)
         />
       ) : null}
       {seqs}
       {cuts.slice(1).map((c) => (
-        <Flash key={c} at={c} color={c === cuts[1] || c === cuts[4] ? COLORS.thumb : COLORS.white} strength={c === cuts[1] ? 1 : 0.75} />
+        <Flash key={c} at={c} color={c === cuts[4] ? COLORS.thumb : COLORS.white} strength={0.75} />
       ))}
       <Scanlines />
       <Grain />

@@ -7,10 +7,10 @@ import { GlitchText, useShake } from "../fx";
 export const IqScramble: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const lockAt = b(4.5);
+  const lockAt = b(6);
   const locked = frame >= lockAt;
   const n = Math.floor(random(`iq${Math.floor(frame / 2)}`) * 200);
-  const hits = [0, b(1), b(2), b(3), lockAt];
+  const hits = [0, b(2), b(4), lockAt];
   const shake = useShake(hits, 20, 7);
 
   const beatLocal = frame % b(1);
