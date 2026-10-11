@@ -12,12 +12,10 @@ export const Logo: React.FC = () => {
   const glitch = interpolate(frame, [0, 14, b(2), b(2) + 2, b(2) + 8], [1, 0.08, 0.08, 0.9, 0.05], { extrapolateRight: "clamp" });
   const shake = useShake([0, b(2)], 34, 10);
 
-  const tagAt = b(3);
-  const tag = interpolate(frame, [tagAt, tagAt + 12], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const soonAt = b(5);
+  const soonAt = b(3);
   const soon = spring({ frame: frame - soonAt, fps, config: { damping: 14 } });
-  const footer = interpolate(frame, [b(6), b(6.6)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const logoUp = interpolate(tag, [0, 1], [0, -260]);
+  const footer = interpolate(frame, [b(4.5), b(5.1)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoUp = interpolate(soon, [0, 1], [0, -150]);
 
   // arkadaki nabız gibi atan kırmızı ışık
   const pulse = interpolate(frame % b(1), [0, b(1)], [1, 0.35]);
@@ -34,28 +32,11 @@ export const Logo: React.FC = () => {
         <GlitchText size={560} glitch={glitch} seed="logo" color={COLORS.thumb}>tiq.</GlitchText>
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          top: 980,
-          width: "100%",
-          textAlign: "center",
-          fontFamily,
-          fontSize: 70,
-          lineHeight: 1.15,
-          color: "#ffffffcc",
-          opacity: tag,
-          transform: `translateY(${(1 - tag) * 40}px)`,
-          whiteSpace: "pre",
-        }}
-      >
-        {"separating the good apples\nfrom the bad ones."}
-      </div>
 
       <div
         style={{
           position: "absolute",
-          top: 1260,
+          top: 1180,
           width: "100%",
           textAlign: "center",
           fontFamily,

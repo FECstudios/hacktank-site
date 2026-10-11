@@ -4,12 +4,11 @@ import { COLORS, b, fontFamily } from "../theme";
 import { GlitchText, useShake } from "../fx";
 
 // Sakin giriş (12 beat, drop'a kadar):
-//  0-2  "the comments section"   (daktilo)
+//  0-2  TIKTOK USERS             (yavaşça belirir)
 //  2-4  beyin çürüten yorumlar uçuşur
-//  4-6  IS COOKED.               (çarpma)
-//  6-8  "but your reposts"       (daktilo)
-//  8-10 SAY / A LOT              (beat başına çarpma)
-// 10-12 ABOUT YOU.               (gerilim, drop'a yaklaşırken büyür)
+//  4-6  ARE BRAINROTTED.         (çarpma)
+//  6-8  "but are you"            (daktilo)
+//  8-12 ANY DIFFERENT?           (çarpma, drop'a kadar yavaşça büyür)
 
 const COMMENTS = [
   { u: "@xx_lil_d", t: "who asked" },
@@ -80,18 +79,30 @@ const Slam: React.FC<{ text: string; at: number; size: number; color?: string; s
   );
 };
 
+const Reveal: React.FC<{ text: string; size: number }> = ({ text, size }) => {
+  const frame = useCurrentFrame();
+  const o = interpolate(frame, [0, b(1)], [0, 1], { extrapolateRight: "clamp" });
+  const blur = interpolate(frame, [0, b(1)], [24, 0], { extrapolateRight: "clamp" });
+  const scale = interpolate(frame, [0, b(2)], [1.15, 1], { extrapolateRight: "clamp" });
+  return (
+    <div style={{ opacity: o, filter: `blur(${blur}px)`, transform: `scale(${scale})`, width: "100%" }}>
+      <GlitchText size={size} glitch={0.06} seed="users">{text}</GlitchText>
+    </div>
+  );
+};
+
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
   const beat = frame / b(1);
-  const shake = useShake([b(4), b(8), b(9), b(10)], 26, 8);
+  const shake = useShake([b(4), b(8)], 26, 8);
 
-  // ABOUT YOU. drop'a doğru yavaşça büyür
-  const tension = interpolate(frame, [b(10), b(12)], [1, 1.25], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // ANY DIFFERENT? drop'a kadar yavaşça büyür
+  const tension = interpolate(frame, [b(8.5), b(12)], [1, 1.3], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const bg = beat >= 4 && beat < 6 ? COLORS.side : COLORS.bg;
 
   return (
     <AbsoluteFill style={{ background: bg, justifyContent: "center", alignItems: "center" }}>
-      {beat < 6 && (
+      {beat >= 2 && beat < 6 && (
         <AbsoluteFill style={{ filter: beat >= 4 ? "blur(6px)" : undefined, opacity: beat >= 4 ? 0.5 : 1 }}>
           {COMMENTS.map((_, i) => (
             <Chip key={i} i={i} at={b(2) + Math.round(i * b(0.25))} fallAt={b(4)} />
@@ -100,17 +111,15 @@ export const Intro: React.FC = () => {
       )}
 
       <div style={{ transform: shake, width: "100%" }}>
-        {beat < 2 && <Typewriter text="the comments section" from={0} dur={b(2)} />}
+        {beat < 2 && <Reveal text={"TIKTOK\nUSERS"} size={260} />}
         {beat >= 2 && beat < 4 && (
-          <div style={{ position: "absolute", top: 110, left: 0, right: 0, fontFamily, fontSize: 80, color: "#ffffff66", textAlign: "center" }}>the comments section</div>
+          <div style={{ position: "absolute", top: -820, left: 0, right: 0, fontFamily, fontSize: 90, color: "#ffffff77", textAlign: "center", letterSpacing: "0.08em" }}>TIKTOK USERS</div>
         )}
-        {beat >= 4 && beat < 6 && <Slam text={"IS\nCOOKED."} at={b(4)} size={300} color={COLORS.thumb} seed="cooked" />}
-        {beat >= 6 && beat < 8 && <Typewriter text="but your reposts" from={b(6)} dur={b(2)} />}
-        {beat >= 8 && beat < 9 && <Slam text="SAY" at={b(8)} size={320} seed="say" />}
-        {beat >= 9 && beat < 10 && <Slam text="A LOT" at={b(9)} size={320} seed="alot" />}
-        {beat >= 10 && (
+        {beat >= 4 && beat < 6 && <Slam text={"ARE\nBRAINROTTED."} at={b(4)} size={190} color={COLORS.thumb} seed="rot" />}
+        {beat >= 6 && beat < 8 && <Typewriter text="but are you" from={b(6)} dur={b(2)} />}
+        {beat >= 8 && (
           <div style={{ transform: `scale(${tension})` }}>
-            <Slam text={"ABOUT\nYOU."} at={b(10)} size={300} color={COLORS.white} seed="about" />
+            <Slam text={"ANY\nDIFFERENT?"} at={b(8)} size={185} color={COLORS.white} seed="diff" />
           </div>
         )}
       </div>
