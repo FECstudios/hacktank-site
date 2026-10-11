@@ -19,8 +19,11 @@ button:disabled { opacity: .5; cursor: default; }
 
 /* ---------- yerleşim ---------- */
 .app { display: grid; grid-template-columns: 300px 1fr; height: 100dvh; }
-.app.collapsed { grid-template-columns: 0 1fr; }
-.app.collapsed .sidebar { visibility: hidden; }
+.app.collapsed { grid-template-columns: 96px 1fr; }
+.app.collapsed .sidebar > :not(.sidebar-head),
+.app.collapsed .logo { display: none; }
+.app.collapsed .sidebar-head { justify-content: center; padding-top: 16px; }
+.app.collapsed .burger span { width: 44px; }
 
 /* ---------- sol panel ---------- */
 .sidebar { background: var(--side); padding: 0 12px 16px; display: flex; flex-direction: column; overflow: hidden; }
@@ -52,11 +55,21 @@ button:disabled { opacity: .5; cursor: default; }
 /* video */
 .feed { display: flex; align-items: flex-end; gap: 21px; height: 100%; max-height: 905px; }
 .video-box { height: 100%; aspect-ratio: 559 / 905; background: var(--placeholder); border-radius: 20px; overflow: hidden; }
-.video-box iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video-box { position: relative; }
+.slides { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain; }
+.slides::-webkit-scrollbar { display: none; }
+.slide { height: 100%; scroll-snap-align: start; scroll-snap-stop: always; position: relative; }
+.slide iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.video-box > iframe { display: none; }           /* slayta taşınana kadar gizli */
+.tap-layer { position: absolute; inset: 0 0 72px 0; z-index: 1; }   /* alttaki 72px: player'ın ilerleme çubuğu */
+.slide-end { display: grid; place-content: center; gap: 20px; text-align: center; background: var(--side); font-size: 28px; }
+.slide-end p { margin: 0; }
 .actions, .arrows { display: grid; gap: 18px; }
-.square { width: 75px; height: 75px; border-radius: 20px; background: var(--btn); font-size: 24px; }
+.square { width: 75px; height: 75px; border-radius: 20px; background: var(--btn); display: grid; place-items: center; }
+.square svg { width: 34px; height: 34px; fill: #fff; }
 .square.active { background: var(--thumb); outline: 2px solid #fff; }
-.arrow { width: 125px; height: 125px; border-radius: 20px; background: var(--btn-2); font-size: 56px; }
+.arrow { width: 125px; height: 125px; border-radius: 20px; background: var(--btn-2); font-size: 32px; display: grid; place-items: center; align-content: center; gap: 0; }
+.arrow svg { width: 56px; height: 56px; fill: #fff; margin-bottom: -8px; }
 .counter { text-align: center; font-size: 28px; }
 
 /* hedef kişi (tahmin + sonuç) */
@@ -67,7 +80,7 @@ button:disabled { opacity: .5; cursor: default; }
 
 .guess-label { font-size: 32px; align-self: flex-start; margin-bottom: -16px; }
 .slider-wrap { position: relative; width: 100%; height: 66px; }
-.slider-marks { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font-size: 32px; pointer-events: none; }
+.slider-marks { position: absolute; left: 0; right: 0; top: 100%; display: flex; justify-content: space-between; padding: 6px 20px 0; font-size: 26px; opacity: .8; pointer-events: none; }
 .slider-marks span:nth-child(2) { opacity: .6; }
 .slider {
   --p: .5;
@@ -94,7 +107,8 @@ button:disabled { opacity: .5; cursor: default; }
 /* ---------- mobil (402px tasarımı) ---------- */
 @media (max-width: 800px) {
   .app, .app.collapsed { grid-template-columns: 1fr; grid-template-rows: 1fr 75px; }
-  .app.collapsed .sidebar { visibility: visible; }
+  .app.collapsed .me { display: flex; }
+  .app.collapsed .sidebar-head { padding-top: 0; }
   .stage { grid-row: 1; padding: 0; }
 
   /* sol panel → alt çubuk */
@@ -122,16 +136,17 @@ button:disabled { opacity: .5; cursor: default; }
   .feed { position: relative; height: 100%; width: 100%; max-height: none; display: block; }
   .video-box { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
   .actions { position: absolute; right: 10px; bottom: 23px; }
-  .arrows { position: absolute; right: 10px; bottom: 300px; gap: 10px; }
-  .arrow { width: 75px; height: 60px; font-size: 32px; border-radius: 20px; }
+  .arrows { position: absolute; top: 12px; right: 12px; z-index: 2; }
+  .arrow { display: none; }
   .counter { font-size: 22px; text-shadow: 0 0 6px #000; }
+  .actions { z-index: 2; }
 
   /* tahmin: dikey slider sağda */
   .target { height: 100%; justify-content: flex-start; padding-top: 48px; gap: 12px; position: relative; }
   .avatar-big { width: 159px; height: 159px; }
   .guess-label { position: absolute; right: 8px; top: 250px; width: 100px; text-align: center; margin: 0; font-size: 28px; line-height: 1; }
   .slider-wrap { position: absolute; right: 24px; top: 330px; width: 70px; height: min(387px, calc(100% - 420px)); }
-  .slider-marks { flex-direction: column-reverse; padding: 12px 0; }
+  .slider-marks { top: -36px; bottom: -36px; flex-direction: column-reverse; align-items: center; padding: 0; }
   .slider-marks span:nth-child(2) { display: none; }
   .slider {
     width: 70px; height: 100%; writing-mode: vertical-lr; direction: rtl;
