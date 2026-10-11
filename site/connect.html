@@ -28,9 +28,21 @@
 </main>
 
 <script type="module">
-import { TIKTOK_CLIENT_KEY, REDIRECT_URI, SCOPES } from "./config.js";
+import { TIKTOK_CLIENT_KEY, REDIRECT_URI, SCOPES, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 
-document.getElementById("connect").onclick = () => {
+                // Supabase kütüphanesini internetten yüklemek:
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+
+                // Supabase'e bağlanmak:
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const { data: { session } } = await supabase.auth.getSession();
+
+ if (!session || !session.access_token) {
+        location.href = "login.html";
+  } else {
+
+    document.getElementById("connect").onclick = () => {
   // CSRF koruması: rastgele state üret, dönüşte aynısı mı diye kontrol et
   const state = crypto.randomUUID();
   sessionStorage.setItem("tiktok_state", state);
@@ -46,6 +58,10 @@ document.getElementById("connect").onclick = () => {
   });
   location.href = `https://www.tiktok.com/v2/auth/authorize/?${params}`;
 };
+
+  }
+
+
 </script>
 </body>
 </html>
