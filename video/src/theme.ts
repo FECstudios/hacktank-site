@@ -14,7 +14,9 @@ export const COLORS = {
 };
 
 export const FPS = 30;
-// Müzik gelince sadece BPM'i değiştir: bütün kesmeler beat'e göre hesaplanıyor.
-export const BPM = 120;
-export const BEAT = Math.round((60 / BPM) * FPS); // 120 BPM → 15 kare
+// "HIGHS AND LOWS" analizi: ~95 BPM, ilk beat 0.035 sn, drop 12. beatte (≈7.6 sn).
+export const BPM = 95;
+export const BEAT = (60 / BPM) * FPS; // ≈18.95 kare (kesirli: kayma birikmesin diye)
 export const b = (beats: number) => Math.round(beats * BEAT);
+export const AUDIO_FILE = "highs-and-lows.mp3";
+export const AUDIO_FIRST_BEAT_SEC = 0.035;

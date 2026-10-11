@@ -61,8 +61,8 @@ export const Feed: React.FC = () => {
       </div>
       <AbsoluteFill style={{ justifyContent: "center", opacity: textOpacity, background: `rgba(0,0,0,${0.45 * textOpacity})` }}>
         <div style={{ transform: shake }}>
-          <GlitchText size={250} glitch={textGlitch} seed="about">
-            {"ABOUT\nYOU."}
+          <GlitchText size={250} glitch={textGlitch} seed="who">
+            {"WHO ARE\nTHEY?"}
           </GlitchText>
         </div>
       </AbsoluteFill>
