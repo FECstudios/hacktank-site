@@ -16,3 +16,5 @@ code { background: #1c1c1c; padding: 1px 6px; border-radius: 4px; }
 footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #222; color: #888; }
 
 #player { width: 100%; max-width: 340px; aspect-ratio: 9 / 16; border: 0; border-radius: 12px; }
+
+.play-link { display: inline-block; margin-top: 8px; padding: 12px 28px; border-radius: 999px; background: #6F0000; color: #fff; text-decoration: none; font-size: 20px; }

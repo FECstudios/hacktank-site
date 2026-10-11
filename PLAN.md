@@ -153,11 +153,11 @@ Kural: **Puan, IQ ve multiplier hesabı asla tarayıcıda yapılmaz.** Tarayıc�
 - [x] **3. Giriş:** (OTP kod yerine magic link + Brevo SMTP) `login.html` → `signInWithOtp({ email })` + `verifyOtp({ email, token, type: 'email' })`. Kayıt olunca `profiles` satırı (trigger ile: `on auth.users insert`)
 - [x] **4. TikTok bağlama:** `tiktok-exchange`'i Supabase kullanıcısına bağla
 - [x] **5. Repost çekme:** `fetch-reposts` + Apify. Önce `profiles` alan adını Apify Input sekmesinden doğrula
-- [ ] **6. RPC'ler:** `0003_rpc.sql` → `next_target`, `submit_guess`. SQL editöründe iki test kullanıcısıyla dene
-- [ ] **7. Feed:** `app.html` → player, ↑/↓, %50 kuralı
-- [ ] **8. Tahmin + sonuç ekranı**
-- [ ] **9. Likes / report / view on tt**
-- [ ] **10. Gizlilik politikası:** repost'ların Apify ile herkese açık profilden çekildiğini yaz, Apify'ı "Service providers"a ekle
+- [x] **6. RPC'ler:** `0003_rpc.sql` → `next_target`, `submit_guess`. SQL editöründe iki test kullanıcısıyla dene
+- [x] **7. Feed:** `app.html` → player, ↑/↓, %50 kuralı
+- [x] **8. Tahmin + sonuç ekranı**
+- [x] **9. Likes / view on tt** (report butonu henüz yok)
+- [x] **10. Gizlilik politikası:** repost'ların Apify ile herkese açık profilden çekildiğini yaz, Apify'ı "Service providers"a ekle
 - [ ] **11. Test:** 3-4 arkadaşla gerçek oyun
 
 Her adımdan sonra: Supabase'de **Advisors → Security** uyarılarına bak (ya da bana "kontrol et" de).
