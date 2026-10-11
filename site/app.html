@@ -147,11 +147,13 @@ let myLikes = {};   // video_id -> 1 (like) / -1 (dislike)
 // Aktif video + bir önceki + bir sonraki aynı anda yüklenir (paralel), diğerleri kaldırılır.
 // Aktif olanın id'si "player" olur; komşular durdurulmuş halde hazır bekler.
 const PRELOAD = 1;
-function videoUrl(i, autoplay) {
-  return `https://www.tiktok.com/player/v1/${videos[i].video_id}?autoplay=${autoplay ? 1 : 0}&loop=1&description=0&music_info=0&rel=0`;
+// Hepsi autoplay=1: tarayıcılar JavaScript'ten gelen "play" komutunu engelliyor, URL'deki autoplay'e izin veriyor.
+// Komşular sessiz oynayarak bekler; sırası gelince başa sarılıp sesi açılır.
+function videoUrl(i) {
+  return `https://www.tiktok.com/player/v1/${videos[i].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`;
 }
-function post(frame, type) {
-  frame?.contentWindow?.postMessage({ type, "x-tiktok-player": true }, "https://www.tiktok.com");
+function post(frame, type, value) {
+  frame?.contentWindow?.postMessage({ type, value, "x-tiktok-player": true }, "https://www.tiktok.com");
 }
 function showVideo() {
   document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
@@ -162,7 +164,7 @@ function showVideo() {
     if (near && !frame) {
       frame = document.createElement("iframe");
       frame.allow = "autoplay; fullscreen; encrypted-media";
-      frame.src = videoUrl(i, i === current);
+      frame.src = videoUrl(i);
       slides[i].append(frame);
     } else if (!near && frame) {
       frame.remove();
@@ -170,8 +172,8 @@ function showVideo() {
     }
     if (frame) {
       frame.id = i === current ? "player" : "";
-      if (i === current) { post(frame, "unMute"); post(frame, "play"); }
-      else post(frame, "pause");
+      if (i === current) { post(frame, "seekTo", 0); post(frame, "unMute"); post(frame, "play"); }
+      else post(frame, "mute");
     }
   }
   updateLikeButtons();
@@ -193,6 +195,10 @@ window.addEventListener("message", (event) => {
 
   // Komşu videolar da "hazırım" der; sadece ekrandaki (aktif) video sesli oynasın.
   const active = document.getElementById("player");
+  if (msg.type === "onPlayerReady" && active && event.source !== active.contentWindow) {
+    event.source.postMessage({ type: "mute", "x-tiktok-player": true }, "https://www.tiktok.com");   // komşu: sessiz beklesin
+    return;
+  }
   if (msg.type === "onPlayerReady" && active && event.source === active.contentWindow) {
     const player = active.contentWindow;
     player.postMessage({ type: "unMute", "x-tiktok-player": true }, "https://www.tiktok.com");
