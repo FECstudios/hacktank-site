@@ -18,13 +18,24 @@
 <section class="card" id="game">
   <button id="start">Start</button>
   <p id="game-message"></p>
+
+  <div id="feed" hidden>
+  <iframe id="player" allow="autoplay; fullscreen; encrypted-media"></iframe>
+  <div>
+    <button id="prev">↑ Previous</button>
+    <span id="counter"></span>
+    <button id="next">↓ Next</button>
+  </div>
+</div>
+
+
 </section>  
 
 </main>
 
 <script type="module">
 import { REDIRECT_URI, SCOPES, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
-
+let current = 0;
                 // Supabase kütüphanesini internetten yüklemek:
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -68,11 +79,37 @@ if(rpcError){
       videos = data.videos;
       document.getElementById("game-message").textContent = videos.length + " videos loaded!"
       console.log(videos);
-
-
+      current = 0
+      document.getElementById("feed").hidden = false;
+      showVideo();
     }}}
+document.getElementById("next").onclick = async () => {
+  if(current != 9){
+      current++
+      showVideo();
+  }else{
+    //BİTTİ.  
+  }
+}
+document.getElementById("prev").onclick = async () => {
+  if(current != 0){
+      current--
+      showVideo();
+  }else{
+    console.log("first video already")
+  }
+
+}
+
 };
 }
+
+function showVideo() {
+  document.getElementById("counter").textContent = (current + 1) + " / " + videos.length
+  document.getElementById("player").src = `https://www.tiktok.com/player/v1/${videos[current].video_id}?autoplay=1&loop=1&description=0&music_info=0&rel=0`
+}
+
+
 </script>
 </body>
 </html>
