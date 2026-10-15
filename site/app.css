@@ -81,7 +81,7 @@ button:disabled { opacity: .5; cursor: default; }
 .hidden-avatar { display: grid; place-items: center; font-size: 72px; color: #555; }
 
 .guess-label { font-size: 32px; align-self: flex-start; margin-bottom: -16px; }
-.slider-wrap { position: relative; width: 100%; height: 66px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
+.slider-wrap { --p: .5; position: relative; width: 100%; height: 66px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
 .slider { touch-action: none; }
 .slider-marks { position: absolute; left: 0; right: 0; top: 100%; display: flex; justify-content: space-between; padding: 6px 20px 0; font-size: 26px; opacity: .8; pointer-events: none; }
 .slider-marks span:nth-child(2) { opacity: .6; }
