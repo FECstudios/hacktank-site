@@ -2,29 +2,175 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>tiq – Guess their IQ from their reposts</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>tiq – Guess their IQ from their TikTok reposts</title>
+<meta name="description" content="tiq is a social guessing game: watch the TikTok videos someone reposted, then guess their in-game IQ.">
+<meta name="theme-color" content="#230000">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="tiq – Guess their IQ from their TikTok reposts">
+<meta property="og:description" content="Watch the videos someone reposted. Guess their in-game IQ. See the reveal.">
+<meta property="og:image" content="icon-1024.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Squada+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="home.css">
 </head>
 <body>
+
+<header class="nav">
+  <a class="brand" href="./"><img src="favicon-32.png" alt="" width="28" height="28"> tiq.</a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#privacy">Privacy &amp; safety</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <a class="btn btn-small" href="app.html">Play</a>
+</header>
+
 <main>
-<h1>tiq</h1>
-<p class="lead">Guess someone's IQ from their TikTok reposts.</p>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">A social guessing game</p>
+      <h1>Guess their IQ<br><span>from their reposts.</span></h1>
+      <p class="lead">Watch ten TikTok videos someone reposted, without knowing who they are. Then guess their in-game IQ. The reveal shows who they were and how close you got.</p>
+      <div class="cta">
+        <a class="btn" href="app.html">Play now</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+      </div>
+      <p class="fine">Free · No passwords · 13+</p>
+    </div>
 
-<ol>
-  <li>Sign in with email and connect your TikTok account.</li>
-  <li>Everyone starts with an in-game IQ of 100.</li>
-  <li>Watch another player's reposts and guess their IQ.</li>
-  <li>See their score. The smarter you are, the more your guess counts.</li>
-</ol>
+    <!-- telefon maketi: oyunun iki ekranı -->
+    <div class="phones" aria-hidden="true">
+      <div class="phone">
+        <div class="screen feed">
+          <div class="pill-top">watching a hidden player · 3 / 10</div>
+          <div class="video"><div class="blob"></div></div>
+          <div class="side-btns"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <div class="phone phone-2">
+        <div class="screen guess">
+          <div class="avatar">?</div>
+          <div class="handle">@hidden</div>
+          <div class="g-label">Guess their IQ</div>
+          <div class="track"><div class="fill"></div><div class="thumb">131</div></div>
+          <div class="submit">submit</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<p><a class="play-link" href="app.html">Play now →</a></p>
+  <!-- How it works -->
+  <section id="how" class="section">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <span class="num">1</span>
+        <h3>Sign in with email</h3>
+        <p>We send you a one-time login link. No passwords to remember or leak.</p>
+      </li>
+      <li>
+        <span class="num">2</span>
+        <h3>Connect your TikTok</h3>
+        <p>Through TikTok's official Login Kit. It proves the account is yours, so nobody can add someone else's profile.</p>
+      </li>
+      <li>
+        <span class="num">3</span>
+        <h3>Watch and guess</h3>
+        <p>Scroll through ten videos a hidden player reposted, like a tiny For You page. Then slide to guess their IQ.</p>
+      </li>
+      <li>
+        <span class="num">4</span>
+        <h3>See the reveal</h3>
+        <p>Find out who it was, their real in-game IQ and how your guess moved their score. Next person.</p>
+      </li>
+    </ol>
+  </section>
 
-<p class="muted">Built for <a href="https://hacktank.hackclub.com">HackTank</a>, a Hack Club program.</p>
+  <!-- Scoring -->
+  <section id="scoring" class="section split">
+    <div>
+      <h2>Fair, crowd-made scores</h2>
+      <p>Everyone starts at <b>100</b>. Your in-game IQ is shaped by what other players guess after watching your reposts. It's a game score, not a real IQ test.</p>
+    </div>
+    <ul class="facts">
+      <li><b>Smarter guessers count more.</b> A player's guess is weighted by their own in-game IQ, from 0.1× up to 2×.</li>
+      <li><b>Trolls don't count.</b> Guesses that are wildly off are ignored automatically.</li>
+      <li><b>Scores settle over time.</b> The more guesses someone gets, the less any single guess can move them.</li>
+      <li><b>One guess per person.</b> You can't guess the same player twice, or yourself.</li>
+    </ul>
+  </section>
 
-<footer>
-  <a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a> · <a href="mailto:craftfec@gmail.com">Contact</a>
-</footer>
+  <!-- Privacy & safety -->
+  <section id="privacy" class="section">
+    <h2>Privacy &amp; safety</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Only what's needed</h3>
+        <p>From TikTok we only receive your username, display name and profile picture. We never see your TikTok password.</p>
+      </div>
+      <div class="card">
+        <h3>No video downloads</h3>
+        <p>Videos play through TikTok's official embed player and stay on TikTok. We only store which videos to show.</p>
+      </div>
+      <div class="card">
+        <h3>Your data, your call</h3>
+        <p>Delete your account any time from the game settings. Deleting removes your TikTok link, reposts, guesses and scores.</p>
+      </div>
+      <div class="card">
+        <h3>No bullying</h3>
+        <p>Harassing players over their scores breaks our rules and gets accounts removed. Report abuse to <a href="mailto:craftfec@gmail.com">craftfec@gmail.com</a>.</p>
+      </div>
+    </div>
+    <p class="links">Read the full <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms of Service</a>.</p>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="section">
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is this a real IQ test?</summary>
+      <p>No. The "IQ" in tiq is a playful game score that comes from other players' guesses. It says nothing scientific about anyone.</p>
+    </details>
+    <details>
+      <summary>What does tiq see from my TikTok account?</summary>
+      <p>Your username, display name and profile picture (via TikTok Login Kit), plus the IDs of your 10 most recent public reposts so other players can watch them. Nothing private, no messages, no password.</p>
+    </details>
+    <details>
+      <summary>Who can see my reposts?</summary>
+      <p>Other tiq players see your public reposts while guessing, without your name. Your identity is only shown after they submit a guess.</p>
+    </details>
+    <details>
+      <summary>How do I delete my account?</summary>
+      <p>In the game, open the menu → settings → "delete my account". You can also email us at <a href="mailto:craftfec@gmail.com">craftfec@gmail.com</a>.</p>
+    </details>
+    <details>
+      <summary>Is tiq made by TikTok?</summary>
+      <p>No. tiq is an independent project and is not affiliated with, endorsed by or sponsored by TikTok.</p>
+    </details>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final">
+    <h2>Think you can read people?</h2>
+    <a class="btn" href="app.html">Play tiq</a>
+  </section>
 </main>
+
+<footer class="footer">
+  <div class="brand"><img src="favicon-32.png" alt="" width="24" height="24"> tiq.</div>
+  <nav>
+    <a href="terms.html">Terms of Service</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="mailto:craftfec@gmail.com">Contact</a>
+  </nav>
+  <p>Built for <a href="https://hacktank.hackclub.com">HackTank</a>, a Hack Club program. © 2026 tiq. Not affiliated with TikTok.</p>
+</footer>
+
 </body>
 </html>
