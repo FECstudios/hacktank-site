@@ -2,38 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050000">
 <title>Connect TikTok – tiq</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Squada+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
 </head>
 <body>
-<main>
-<p><a href="./">← tiq</a></p>
-<h1>Verify your TikTok</h1>
+<header class="auth-top">
+  <a class="brand" href="./">tiq.</a>
+  <a class="back" href="./">← back</a>
+</header>
 
+<main class="auth">
+  <h1>VERIFY</h1>
+  <p class="lead">Prove the TikTok account is yours by adding a code to your bio. Your profile must be public.</p>
 
-<div class="card">
-  <p class="lead">Prove the account is yours by adding a code to your TikTok bio.</p>
-  <input type="text" id="username" placeholder="@tiktokusername">
-  <button id="get-code"> Get Code </button>
+  <div class="auth-card">
+    <label for="username">Your TikTok username</label>
+    <input type="text" id="username" placeholder="@tiktokusername" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <button id="get-code">GET CODE</button>
 
-    <div id="step2" hidden>
-
-      <p>Add this code to your tiktok bio <i>just for the verification you can remove it after</i></p>
-      <code id="code"></code>
-      <br><button id="copy" class="tiktok-btn">Copy</button>
-      <button id="verify" class="tiktok-btn">I added it, verify</button>
+    <div id="step2" class="step2" hidden>
+      <p class="hint">Add this code to your TikTok bio. You can remove it after verification.</p>
+      <code id="code" class="code-box"></code>
+      <button id="copy" class="secondary">COPY</button>
+      <button id="verify">I ADDED IT, VERIFY</button>
     </div>
-    <p id="msg"></p>
-</div>
+    <p class="msg" id="msg"></p>
+  </div>
+</main>
 
-<footer>
+<footer class="auth-foot">
   <a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a>
 </footer>
-</main>
 
 <script type="module">
 import { SUPABASE_URL, SUPABASE_KEY, FETCH_REPOSTS_URL } from "./config.js";

@@ -1,39 +1,39 @@
-    <!doctype html>
-    <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Login – tiq</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050000">
+<title>Login – tiq</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-            <link rel="stylesheet" href="style.css">
-        </head>
-        <body>
-            <main>
-                <p><a href="./">← tiq</a></p>
-                <h1>LOGIN</h1>
-                <p class="lead">Let's get you logged in</p>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Squada+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<header class="auth-top">
+  <a class="brand" href="./">tiq.</a>
+  <a class="back" href="./">← back</a>
+</header>
 
-                <div class="card">
-                    <p>Enter your mail:</p>
-                    <input type="email" id="email">
-                    <button id="send">SEND</button>
-                    <p id="message"></p>
-                </div>
+<main class="auth">
+  <h1>LOGIN</h1>
+  <p class="lead">Let's get you logged in. We'll email you a link, no password needed.</p>
 
+  <div class="auth-card">
+    <label for="email">Your email</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+    <button id="send">SEND</button>
+    <p class="msg" id="message"></p>
+  </div>
+</main>
 
-
-
-
-            <footer>
-                <a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a>
-            </footer>
-            </main>
-
-
-
-
+<footer class="auth-foot">
+  <a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a>
+</footer>
 
             <script type="module">
 

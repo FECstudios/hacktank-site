@@ -1,0 +1,52 @@
+/* tiq – giriş / bağlama sayfaları (ana sayfa ile aynı renkler) */
+:root {
+  --bg: #050000; --side: #230000; --btn: #6F0000; --btn-2: #820000; --fill: #B90000; --red: #D00000;
+  --text: #f4eeee; --muted: #b9a8a8; --line: #3a1111;
+  --display: "Squada One", system-ui, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; color: var(--text); font: 17px/1.5 var(--body);
+  background: radial-gradient(ellipse at top, #2a0000 0%, var(--bg) 60%) fixed, var(--bg);
+  display: flex; flex-direction: column; align-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+}
+
+.auth-top { width: 100%; max-width: 420px; display: flex; justify-content: space-between; align-items: center; }
+.brand { font-family: var(--display); font-size: 32px; color: var(--red); text-decoration: none; }
+.back { color: var(--muted); text-decoration: none; font-size: 15px; }
+.back:hover { color: var(--text); }
+
+.auth { flex: 1; width: 100%; max-width: 420px; display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
+.auth h1 { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 12vw, 60px); line-height: 1; margin: 0 0 8px; }
+.auth .lead { color: var(--muted); margin: 0 0 24px; }
+
+.auth-card { background: var(--side); border: 1px solid var(--line); border-radius: 20px; padding: 24px; display: grid; gap: 12px; }
+.auth-card label { font-size: 14px; color: var(--muted); }
+.auth-card input {
+  width: 100%; height: 52px; padding: 0 16px; border-radius: 12px; border: 2px solid var(--line);
+  background: #0008; color: var(--text); font-size: 17px; /* 16px+ = iPhone'da zoom yapmaz */
+  outline: none; transition: border-color .15s;
+}
+.auth-card input:focus { border-color: var(--fill); }
+.auth-card button {
+  height: 52px; border: 0; border-radius: 999px; background: var(--btn); color: #fff; cursor: pointer;
+  font-family: var(--display); font-size: 26px; transition: background .15s, transform .08s;
+}
+.auth-card button:hover:not(:disabled) { background: var(--btn-2); }
+.auth-card button:active:not(:disabled) { transform: scale(.97); }
+.auth-card button:disabled { opacity: .5; cursor: default; }
+.msg { margin: 0; min-height: 1.5em; text-align: center; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+
+.auth-foot { font-size: 13px; color: var(--muted); text-align: center; }
+.auth-foot a { color: var(--muted); }
+
+/* connect: ikinci adım (kod) */
+.step2:not([hidden]) { display: grid; gap: 12px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+.hint { margin: 0; font-size: 15px; color: var(--muted); }
+.code-box { display: block; padding: 14px; border-radius: 12px; background: #0008; border: 2px dashed var(--fill);
+            text-align: center; font: 600 20px/1.3 ui-monospace, monospace; color: #fff; overflow-wrap: anywhere; user-select: all; }
+.auth-card button.secondary { background: transparent; border: 2px solid var(--btn); }
+.auth-card button.secondary:hover:not(:disabled) { background: var(--btn); }
