@@ -122,14 +122,20 @@
 <div class="modal" id="profile" hidden>
   <div class="modal-card">
     <h2>profile</h2>
-    <img id="p-avatar" class="p-avatar" alt="avatar">
-    <div id="p-username"></div>
-    <p>IQ: <b id="p-iq"></b></p>
-    <p>guessed by <b id="p-received"></b> people</p>
-    <p>you made <b id="p-made"></b> guesses</p>
-    <p>joined <b id="p-joined"></b></p>
-    <button class="pill" id="refresh-reposts">refresh my reposts</button>
-    <p id="p-msg"></p>
+    <div class="p-head">
+      <img id="p-avatar" class="p-avatar" alt="avatar">
+      <div>
+        <div id="p-username" class="p-name"></div>
+        <div class="p-iq">IQ <b id="p-iq"></b></div>
+      </div>
+    </div>
+    <div class="p-stats">
+      <div><b id="p-received"></b><span>guessed you</span></div>
+      <div><b id="p-made"></b><span>your guesses</span></div>
+      <div><b id="p-joined"></b><span>joined</span></div>
+    </div>
+    <button class="pill p-refresh" id="refresh-reposts">refresh my reposts</button>
+    <p id="p-msg" class="p-msg"></p>
     <button class="ghost" id="close-profile">close</button>
   </div>
 </div>
