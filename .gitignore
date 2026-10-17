@@ -21,3 +21,6 @@ supabase/.branches/
 
 # Teaser videosu (Remotion) – repoya girmiyor
 video/
+
+# Claude talimatları (yerel)
+CLAUDE.md

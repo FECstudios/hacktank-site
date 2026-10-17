@@ -56,12 +56,21 @@ Deno.serve(async (req) => {
     const num = () => crypto.getRandomValues(new Uint32Array(1))[0] % 90 + 10;
     const code = `tiq-${pick()}-${pick()}-${num()}`;
 
+        // b2) daha önce kod almış mı? (sayaç sıfırlanmasın diye)
+    const { data: old } = await admin
+      .from("verify_codes")                        // hangi tablo?
+      .select("attempts, created_at")    // sadece lazım olan iki sütun
+      .eq("profile_id", user.id)                 // hangi sütun bu kullanıcıyı gösteriyor?
+      .maybeSingle();                    // satır yoksa hata değil, null
+    const recent = old && Date.now() - new Date(old.created_at).getTime() < 30 * 60_000
+    const attempts = recent ? old.attempts : 0;
+
     // d) kaydet (upsert)
     const { error: saveError } = await admin.from("verify_codes").upsert({
       profile_id: user.id,
       username: username,
       code: code,
-      attempts: 0,
+      attempts: attempts,
       created_at: new Date().toISOString(),
     });
     if (saveError) return json({ error: "db_error", detail: saveError.message }, 500);
