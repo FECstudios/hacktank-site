@@ -21,7 +21,7 @@ const ALLOWED_ORIGINS = ["https://fecstudios.github.io", "http://localhost:5174"
 const ACTOR = "clockworks~tiktok-scraper";
 const RESULTS_PER_PROFILE = 10;
 const MIN_REPOSTS_FOR_FEED = 5;
-const CACHE_HOURS = 24;
+const CACHE_HOURS = 24 * 6.5;
 const RETRY_MINUTES = 10;
 const MONTHLY_RUN_LIMIT = 120; // ~$0.038 x 120 ≈ $4.6 (Apify free: $5/ay)
 

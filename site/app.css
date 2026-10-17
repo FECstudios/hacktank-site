@@ -179,3 +179,6 @@ button:disabled { opacity: .5; cursor: default; }
 .square:active, .arrow:active, .pill:active:not(:disabled) { transform: scale(.94); }
 .square.active svg { transform: scale(1.1); }
 .slide-end .pill { font-size: 28px; }
+
+
+.p-avatar { width: 80px; height: 80px; border-radius: 50%; }

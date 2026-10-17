@@ -119,8 +119,23 @@
   </div>
 </div>
 
+<div class="modal" id="profile" hidden>
+  <div class="modal-card">
+    <h2>profile</h2>
+    <img id="p-avatar" class="p-avatar" alt="avatar">
+    <div id="p-username"></div>
+    <p>IQ: <b id="p-iq"></b></p>
+    <p>guessed by <b id="p-received"></b> people</p>
+    <p>you made <b id="p-made"></b> guesses</p>
+    <p>joined <b id="p-joined"></b></p>
+    <button class="pill" id="refresh-reposts">refresh my reposts</button>
+    <p id="p-msg"></p>
+    <button class="ghost" id="close-profile">close</button>
+  </div>
+</div>
+
 <script type="module">
-import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
+import { SUPABASE_URL, SUPABASE_KEY, FETCH_REPOSTS_URL } from "./config.js";
 
                 // Supabase kütüphanesini internetten yüklemek:
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -513,6 +528,50 @@ document.getElementById("close-settings").onclick = () => (document.getElementBy
 document.getElementById("nav-profile").onclick =
 document.getElementById("nav-history").onclick = () => {
   document.getElementById("game-message").textContent = "Coming soon!";
+};
+
+document.getElementById("nav-profile").onclick = openProfile;
+document.getElementById("close-profile").onclick = () => (document.getElementById("profile").hidden = true);
+
+async function openProfile() {
+  document.getElementById("profile").hidden = false;
+
+  const { data: p } = await supabase
+    .from("profiles")
+    .select("tiktok_username, avatar_url, iq, guesses_received, created_at")
+    .eq("id", session.user.id)
+    .single();
+
+  const { count } = await supabase
+    .from("guesses")
+    .select("*", { count: "exact", head: true })
+    .eq("guesser_id", session.user.id)
+
+  document.getElementById("p-avatar").src = p.avatar_url;
+  document.getElementById("p-username").textContent = "@" + p.tiktok_username;
+  document.getElementById("p-iq").textContent = Math.round(p.iq);
+  document.getElementById("p-received").textContent = p.guesses_received;
+  document.getElementById("p-made").textContent = count ?? 0;
+  document.getElementById("p-joined").textContent = new Date(p.created_at).toLocaleDateString();
+}
+
+document.getElementById("refresh-reposts").onclick = async () => {
+  const btn = document.getElementById("refresh-reposts");
+  const msg = document.getElementById("p-msg");
+  btn.disabled = true
+  msg.textContent = "Loading your reposts… (~1 min)"
+
+  const { data: { session: fresh } } = await supabase.auth.getSession();
+  const res = await fetch(FETCH_REPOSTS_URL, {
+    method: "POST",
+    headers: { "Authorization": "Bearer "+ fresh.access_token },
+  }).catch(() => null);
+  const data = res ? await res.json().catch(() => ({})) : {detail:"Network error."}
+
+  if(data.cached) msg.textContent = "You can refresh once a week.";
+  else if (data.count !== undefined) msg.textContent = `Done! ${data.count} reposts loaded.`;
+  else msg.textContent = data.detail || data.error;
+  btn.disabled = false;
 };
 
 document.getElementById("logout").onclick = async () => {
